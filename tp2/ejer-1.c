@@ -27,7 +27,7 @@ typedef struct nodo {
 } tNodo;
 
 // Variables globales
-tNodo cabecera;
+tNodo* cabecera = NULL; // Inicializo variable puntero como NULL (no apunta a ningun nodo)
 
 // Prototipado 
 tDatosJuego ingresarDatos();
@@ -37,15 +37,21 @@ void mostrarDatos(tDatosJuego);
 
 // Funcion principal 
 int main (){
+	// Creo los datos del juego
 	tDatosJuego juego = ingresarDatos();
 
+	// Creo el nodo pasandole los datos y hacia donde apunta
 	tNodo* nuevoNodo = crearNodo(juego, NULL);
 
-	cabecera = *nuevoNodo;
+	// Ahora el puntero apunta hacia el nuevo nodo
+	cabecera = nuevoNodo;
 
-	tNodo* aux;
+	// Se crea un nuevo apuntador auxiliar y se le asigna el valor de la cabecera
+	tNodo* aux = cabecera;
 	while(aux != NULL){
 		mostrarDatos(cabecera->datos);
+
+		// Se apunta al nodo siguiente al que apunta la cabecera y asi sucesivamente
 		aux = cabecera->siguiente;
 	}
 
@@ -86,8 +92,9 @@ tNodo* crearNodo(tDatosJuego juego, tNodo* enlace){
 }
 
 void mostrarDatos(tDatosJuego juego){
-	printf("ID: %d", juego.id);
-	printf("Titulo: %s", juego.titulo);
-	printf("Anio de lanzamiento: %d", juego.anioLanzamiento);
-	printf("Precio: %.2f", juego.precio);
+	printf("\n");
+	printf("ID: %d\n", juego.id);
+	printf("Titulo: %s\n", juego.titulo);
+	printf("Anio de lanzamiento: %d\n", juego.anioLanzamiento);
+	printf("Precio: %.2f\n", juego.precio);
 }
