@@ -51,6 +51,7 @@ void pop(tNodo**);
 void eliminarJuegoEnPos(tNodo**);
 void buscarPorId(tNodo**);
 void mostrarLista(tNodo**);
+void cantidadTotalJuegos(tNodo**);
 void crearMenu(tNodo**);
 tDatosJuego ingresarDatos();
 tNodo* crearNodo(tDatosJuego, tNodo*);
@@ -292,6 +293,18 @@ void mostrarLista(tNodo** cabecera){
   }
 }
 
+// Punto j)
+void cantidadTotalJuegos(tNodo** cabecera){
+  tNodo* aux = *cabecera;
+  int contador = 0;
+  while (aux){
+    aux = aux->siguiente;
+    contador++;
+  }
+	printf("Cantidad total de juegos: %d", contador);
+}
+
+
 // Menú
 void mostrarOpcionesMenu(){
 	printf("\n\n========================| Menu |========================\n");
@@ -349,6 +362,9 @@ void crearMenu(tNodo** cabecera) {
             break;
 					case 'i': 
             mostrarLista(cabecera); 
+            break;
+					case 'j': 
+            cantidadTotalJuegos(cabecera); 
             break;
           case 'x':
             salir = 'y'; 
