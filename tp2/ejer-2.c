@@ -52,6 +52,7 @@ void eliminarJuegoEnPos(tNodo**);
 void buscarPorId(tNodo**);
 void mostrarLista(tNodo**);
 void cantidadTotalJuegos(tNodo**);
+void liberarMemoriaTotal(tNodo**);
 void crearMenu(tNodo**);
 tDatosJuego ingresarDatos();
 tNodo* crearNodo(tDatosJuego, tNodo*);
@@ -304,6 +305,19 @@ void cantidadTotalJuegos(tNodo** cabecera){
 	printf("Cantidad total de juegos: %d", contador);
 }
 
+// Punto k)
+void liberarMemoriaTotal(tNodo** cabecera){
+  tNodo* aux = *cabecera;
+  while (aux){
+		tNodo* siguiente = aux->siguiente;
+		free(aux);
+    aux = aux->siguiente;
+  }
+	*cabecera = NULL;
+  printf("\nMemoria liberada exitosamente!\n");
+}
+
+
 
 // Menú
 void mostrarOpcionesMenu(){
@@ -336,42 +350,19 @@ void crearMenu(tNodo** cabecera) {
 				printf("\n\n");
 
         switch (opcion) {
-          case 'a': 
-            inicializarLista(cabecera); 
-            break;
-          case 'b': 
-            preguntarSiLaListaEstaVacia(cabecera); 
-            break;
-          case 'c': 
-            insertarPrimerJuego(cabecera); 
-            break;
-          case 'd': 
-            push(cabecera); 
-            break;
-					case 'e': 
-            insertarJuegoEnPos(cabecera); 
-            break;
-					case 'f': 
-            pop(cabecera); 
-            break;
-					case 'g': 
-            eliminarJuegoEnPos(cabecera); 
-            break;
-					case 'h': 
-            buscarPorId(cabecera); 
-            break;
-					case 'i': 
-            mostrarLista(cabecera); 
-            break;
-					case 'j': 
-            cantidadTotalJuegos(cabecera); 
-            break;
-          case 'x':
-            salir = 'y'; 
-            break;
-          default:
-            printf("Opcion invalida.\n");
+          case 'a': inicializarLista(cabecera); break;
+          case 'b': preguntarSiLaListaEstaVacia(cabecera); break;
+          case 'c': insertarPrimerJuego(cabecera); break;
+          case 'd': push(cabecera); break;
+					case 'e': insertarJuegoEnPos(cabecera); break;
+					case 'f': pop(cabecera); break;
+					case 'g': eliminarJuegoEnPos(cabecera); break;
+					case 'h': buscarPorId(cabecera); break;
+					case 'i': mostrarLista(cabecera); break;
+					case 'j': cantidadTotalJuegos(cabecera); break;
+					case 'k': liberarMemoriaTotal(cabecera); break;
+          case 'x': salir = 'y'; break;
+          default:printf("Opcion invalida.\n");
         }
-        
     } while (salir == 'n');
 }
