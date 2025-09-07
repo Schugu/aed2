@@ -16,6 +16,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #define MAXSTRING 50
 
 // Tipos 
@@ -39,9 +40,12 @@ tNodo* cabecera; // Inicializo variable puntero como NULL (no apunta a ningun no
 
 // Prototipado 
 void inicializarLista(tNodo**);
-void estaLaListaVacia(tNodo**);
+bool estaLaListaVacia(tNodo**);
 void insertarPrimerJuego(tNodo**);
-void insertarJuegoAlPrincipio(tNodo**);
+void push(tNodo**);
+void insertarJuegoEnPos(tNodo**);
+void pop(tNodo**);
+void mostrarLista(tNodo**);
 void crearMenu(tNodo**);
 tDatosJuego ingresarDatos();
 tNodo* crearNodo(tDatosJuego, tNodo*);
@@ -81,12 +85,33 @@ void inicializarLista(tNodo** cabecera) {
 }
 
 // Punto b)
-void estaLaListaVacia(tNodo** cabecera){
+// Luego hacer que solo se muestre la info en una funcio aparte
+bool estaLaListaVacia(tNodo** cabecera){
 	if(*cabecera == NULL){
 		printf("La lista esta vacia\n");
+		return true;
 	} else {
 		printf("La lista NO esta vacia\n");
+		return false;
 	}
+}
+
+tDatosJuego ingresarDatos(){
+	tDatosJuego juego;
+	printf("Ingrese los datos del juego: \n");
+	printf("ID: ");
+	scanf("%d", &juego.id);
+
+	printf("Titulo: ");
+	scanf(" %49[^\n]", juego.titulo);
+
+	printf("Anio lanzamiento: ");
+	scanf("%d", &juego.anioLanzamiento);
+
+	printf("Precio: ");
+	scanf("%f", &juego.precio);
+
+	return juego;
 }
 
 // Crear Nodo
@@ -118,7 +143,7 @@ void insertarPrimerJuego(tNodo** cabecera){
 }
 
 // Punto d)
-void insertarJuegoAlPrincipio(tNodo** cabecera){
+void push(tNodo** cabecera){
 	// Creo los datos del juego
 	tDatosJuego juego = ingresarDatos();
 	
@@ -128,6 +153,87 @@ void insertarJuegoAlPrincipio(tNodo** cabecera){
 	// Ahora el puntero apunta hacia el nuevo nodo
 	*cabecera = nuevoNodo;
 }
+
+// Punto e)
+void insertarJuegoEnPos(tNodo** cabecera){
+	int posicion = 0;
+	printf("Ingrese la posicion de ingreso: ");
+	scanf("%d", &posicion);
+
+	// Validar posicion
+	if (posicion < 0) {
+		printf("\nPosicion invalida\n");
+		return;
+	}
+
+	// Ingresar al principio
+	if (posicion == 0){
+		tDatosJuego juego = ingresarDatos();
+
+		// Creo el nodo pasandole los datos y hacia donde apunta
+		tNodo* nuevoNodo = crearNodo(juego, *cabecera);
+	
+		// Ahora el puntero apunta hacia el nuevo nodo
+		*cabecera = nuevoNodo;
+		return; 
+	}
+
+	tNodo* listaAux = *cabecera;
+	for(int i = 1; i < posicion-1 && listaAux != NULL; i++) {
+    listaAux = listaAux->siguiente;
+  }
+  if (listaAux == NULL) {
+    printf("Error: La posicion es mayor al tamanio de la lista.\n");
+    return;
+  }
+	tDatosJuego juego = ingresarDatos();
+	tNodo* nuevoNodo = crearNodo(juego, listaAux->siguiente);
+	listaAux->siguiente = nuevoNodo;
+  printf("\nVideojuego insertado en la posicion %d: %s", posicion, juego.titulo);
+}
+
+void mostrarDatos(tDatosJuego juego){
+	printf("\n");
+	printf("ID: %d\n", juego.id);
+	printf("Titulo: %s\n", juego.titulo);
+	printf("Anio de lanzamiento: %d\n", juego.anioLanzamiento);
+	printf("Precio: $%.2f\n", juego.precio);
+}
+
+// Punto f)
+void pop(tNodo** cabecera){
+	if (estaLaListaVacia(cabecera)) {
+    return;
+  }
+
+	// Asigno el nodo que quiero eliminar a aux
+	tNodo* aux = *cabecera;
+	
+	// remplazo el tope con el siguiente del nodo a eliminar
+	*cabecera = aux->siguiente;
+
+	// Libero la memoria del nodo
+	free(aux);
+
+	printf("Primer juego eliminado.\n");
+}
+
+// Punto i)
+void mostrarLista(tNodo** cabecera){
+	if (estaLaListaVacia(cabecera)) {
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  int pos = 0;
+  while (aux != NULL){
+    printf("\n--- Juego en posicion %d ---\n", pos);
+    mostrarDatos(aux->datos);
+    aux = aux->siguiente;
+    pos++;
+  }
+}
+
 
 // Menú
 void mostrarOpcionesMenu(){
@@ -168,7 +274,16 @@ void crearMenu(tNodo** cabecera) {
             insertarPrimerJuego(cabecera); 
             break;
           case 'd': 
-            insertarJuegoAlPrincipio(cabecera); 
+            push(cabecera); 
+            break;
+					case 'e': 
+            insertarJuegoEnPos(cabecera); 
+            break;
+					case 'f': 
+            pop(cabecera); 
+            break;
+					case 'i': 
+            mostrarLista(cabecera); 
             break;
           case 'x':
             salir = 'y'; 
@@ -178,32 +293,4 @@ void crearMenu(tNodo** cabecera) {
         }
         
     } while (salir == 'n');
-}
-
-tDatosJuego ingresarDatos(){
-	tDatosJuego juego;
-	printf("Ingrese los datos del juego: \n");
-	printf("ID: ");
-	scanf("%d", &juego.id);
-
-	printf("Titulo: ");
-	scanf(" %49[^\n]", juego.titulo);
-
-	printf("Anio lanzamiento: ");
-	scanf("%d", &juego.anioLanzamiento);
-
-	printf("Precio: ");
-	scanf("%f", &juego.precio);
-
-	return juego;
-}
-
-
-
-void mostrarDatos(tDatosJuego juego){
-	printf("\n");
-	printf("ID: %d\n", juego.id);
-	printf("Titulo: %s\n", juego.titulo);
-	printf("Anio de lanzamiento: %d\n", juego.anioLanzamiento);
-	printf("Precio: %.2f\n", juego.precio);
 }
