@@ -2,17 +2,17 @@
 	2. Modificar el ejercicio 1 para implementar todas las operaciones básicas de una lista enlazada: 
 	a) Inicializar la lista (establecer puntero en NULL). 
 	b) Verificar si una lista está vacía. 
-	c) Insertar el primer videojuego (nodo) de la lista. 
-	d) Insertar un videojuego al principio de la lista. 
-	e) Insertar un videojuego en una posición específica. 
-	f) Eliminar el primer videojuego de la lista. 
-	g) Eliminar un videojuego de una posición específica. 
-	h) Buscar un videojuego por ID y retornar su posición. 
-	i) Visualizar todos los videojuegos de la lista. 
-	j) Contar la cantidad total de videojuegos.  
+	c) Insertar el primer juego (nodo) de la lista. 
+	d) Insertar un juego al principio de la lista. 
+	e) Insertar un juego en una posición específica. 
+	f) Eliminar el primer juego de la lista. 
+	g) Eliminar un juego de una posición específica. 
+	h) Buscar un juego por ID y retornar su posición. 
+	i) Visualizar todos los juegos de la lista. 
+	j) Contar la cantidad total de juegos.  
 	k) Liberar completamente la memoria de la lista. 
 	Crear un menú principal que permita probar todas estas funciones. 
-	Plus: Insertar un videojuego al final de la lista. 
+	Plus: Insertar un juego al final de la lista. 
 */
 
 // Librerias
@@ -53,6 +53,7 @@ void buscarPorId(tNodo**);
 void mostrarLista(tNodo**);
 void cantidadTotalJuegos(tNodo**);
 void liberarMemoriaTotal(tNodo**);
+void insertarJuegoAlFinal(tNodo**);
 void crearMenu(tNodo**);
 tDatosJuego ingresarDatos();
 tNodo* crearNodo(tDatosJuego, tNodo*);
@@ -175,7 +176,7 @@ void insertarJuegoEnPos(tNodo** cabecera){
 	tDatosJuego juego = ingresarDatos();
 	tNodo* nuevoNodo = crearNodo(juego, listaAux->siguiente);
 	listaAux->siguiente = nuevoNodo;
-  printf("\nVideojuego insertado en la posicion %d: %s", posicion, juego.titulo);
+  printf("\njuego insertado en la posicion %d: %s", posicion, juego.titulo);
 }
 
 void mostrarDatos(tDatosJuego juego){
@@ -317,22 +318,41 @@ void liberarMemoriaTotal(tNodo** cabecera){
   printf("\nMemoria liberada exitosamente!\n");
 }
 
+// Punto l)
+void insertarJuegoAlFinal	(tNodo** cabecera){
+	tDatosJuego juego = ingresarDatos();
+	tNodo* nuevoNodo = crearNodo(juego, NULL);
 
+	if (!*cabecera){
+		*cabecera = nuevoNodo;
+	} else {
+		  // Recorrer hasta el último nodo
+    tNodo* aux = *cabecera;
+    while (aux->siguiente) {
+			aux = aux->siguiente;
+    }
+
+    // Enlazar el nuevo nodo al final
+    aux->siguiente = nuevoNodo;
+	}
+  printf("\nJuego insertado al final de la lista con exito!\n");
+}
 
 // Menú
 void mostrarOpcionesMenu(){
 	printf("\n\n========================| Menu |========================\n");
 	printf("[a]: Inicializar la lista (establecer puntero en NULL).\n");
 	printf("[b]: Verificar si una lista esta vacia.\n");
-	printf("[c]: Insertar el primer videojuego (nodo) de la lista.\n");
-	printf("[d]: Insertar un videojuego al principio de la lista.\n");
-	printf("[e]: Insertar un videojuego en una posicion especifica.\n");
-	printf("[f]: Eliminar el primer videojuego de la lista.\n");
-	printf("[g]: Eliminar un videojuego de una posicion especifica.\n");
-	printf("[h]: Buscar un videojuego por ID y retornar su posicion.\n");
-	printf("[i]: Visualizar todos los videojuegos de la lista.\n");
-	printf("[j]: Contar la cantidad total de videojuegos.\n");
+	printf("[c]: Insertar el primer juego (nodo) de la lista.\n");
+	printf("[d]: Insertar un juego al principio de la lista.\n");
+	printf("[e]: Insertar un juego en una posicion especifica.\n");
+	printf("[f]: Eliminar el primer juego de la lista.\n");
+	printf("[g]: Eliminar un juego de una posicion especifica.\n");
+	printf("[h]: Buscar un juego por ID y retornar su posicion.\n");
+	printf("[i]: Visualizar todos los juegos de la lista.\n");
+	printf("[j]: Contar la cantidad total de juegos.\n");
 	printf("[k]: Liberar completamente la memoria de la lista.\n");
+	printf("[l]: Insertar un juego al final de la lista.\n");
 	printf("[x]: Salir.\n\n");
 }
 
@@ -361,6 +381,7 @@ void crearMenu(tNodo** cabecera) {
 					case 'i': mostrarLista(cabecera); break;
 					case 'j': cantidadTotalJuegos(cabecera); break;
 					case 'k': liberarMemoriaTotal(cabecera); break;
+					case 'l': insertarJuegoAlFinal(cabecera); break;
           case 'x': salir = 'y'; break;
           default:printf("Opcion invalida.\n");
         }
