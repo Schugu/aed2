@@ -14,6 +14,8 @@
 	Crear un menú principal que permita probar todas estas funciones. 
 	Plus: Insertar un videojuego al final de la lista. 
 */
+
+// Librerias
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -45,6 +47,7 @@ void insertarPrimerJuego(tNodo**);
 void push(tNodo**);
 void insertarJuegoEnPos(tNodo**);
 void pop(tNodo**);
+void eliminarJuegoEnPos(tNodo**);
 void mostrarLista(tNodo**);
 void crearMenu(tNodo**);
 tDatosJuego ingresarDatos();
@@ -52,48 +55,27 @@ tNodo* crearNodo(tDatosJuego, tNodo*);
 void mostrarOpcionesMenu();
 void mostrarDatos(tDatosJuego);
 
-
 // Funcion principal 
 int main (){
 	crearMenu(&cabecera);
 
-// 	// Creo los datos del juego
-// 	tDatosJuego juego = ingresarDatos();
-
-// 	// Creo el nodo pasandole los datos y hacia donde apunta
-// 	tNodo* nuevoNodo = crearNodo(juego, NULL);
-
-// 	// Ahora el puntero apunta hacia el nuevo nodo
-// 	cabecera = nuevoNodo;
-
-// 	// Se crea un nuevo apuntador auxiliar y se le asigna el valor de la cabecera
-// 	tNodo* aux = cabecera;
-// 	while(aux != NULL){
-// 		mostrarDatos(cabecera->datos);
-
-// 		// Se apunta al nodo siguiente al que apunta la cabecera y asi sucesivamente
-// 		aux = cabecera->siguiente;
-// 	}
-
-// 	return 0;
+	return 0;
 } 
 
+// Funciones
 // Punto a)
 void inicializarLista(tNodo** cabecera) {
 	*cabecera = NULL;
 	printf("Lista inicializada!\n");
 }
 
-// Punto b)
-// Luego hacer que solo se muestre la info en una funcio aparte
 bool estaLaListaVacia(tNodo** cabecera){
-	if(*cabecera == NULL){
-		printf("La lista esta vacia\n");
-		return true;
-	} else {
-		printf("La lista NO esta vacia\n");
-		return false;
-	}
+	return (*cabecera == NULL) ? true : false;
+}
+
+// Punto b)
+void preguntarSiLaListaEstaVacia(tNodo** cabecera){
+	estaLaListaVacia(cabecera) ? printf("La lista esta vacia\n") : printf("La lista NO esta vacia\n"); 
 }
 
 tDatosJuego ingresarDatos(){
@@ -193,7 +175,6 @@ void insertarJuegoEnPos(tNodo** cabecera){
 }
 
 void mostrarDatos(tDatosJuego juego){
-	printf("\n");
 	printf("ID: %d\n", juego.id);
 	printf("Titulo: %s\n", juego.titulo);
 	printf("Anio de lanzamiento: %d\n", juego.anioLanzamiento);
@@ -203,6 +184,7 @@ void mostrarDatos(tDatosJuego juego){
 // Punto f)
 void pop(tNodo** cabecera){
 	if (estaLaListaVacia(cabecera)) {
+		printf("Error: No se puede eliminar por que la lista esta vacia.");
     return;
   }
 
@@ -218,10 +200,52 @@ void pop(tNodo** cabecera){
 	printf("Primer juego eliminado.\n");
 }
 
+// Punto g)
+void eliminarJuegoEnPos(tNodo** cabecera){
+	int posicion = 0;
+	printf("Ingrese la posicion de ingreso: ");
+	scanf("%d", &posicion);
+
+	// Validar posicion
+	if (posicion < 0) {
+		printf("\nPosicion invalida\n");
+		return;
+	}
+
+	// Eliminar primer posicion (pop)
+	if (posicion == 0){
+		pop(cabecera);
+		printf("Juego eliminado exitosamente de la posicion: %d", posicion); 
+		return;
+	}
+
+	// Buscar el nodo anterior al que quiero eliminar
+	tNodo* listaAux = *cabecera;
+	for(int i = 1; i < posicion-1 && listaAux != NULL; i++) {
+    listaAux = listaAux->siguiente;
+  }
+
+	if (!listaAux || !listaAux->siguiente) {
+    printf("Error: La posicion es mayor al tamanio de la lista.\n");
+    return;
+  }
+
+	// Puntero al nodo a eliminar
+	tNodo* juegoSuprimir = listaAux->siguiente;
+
+	// Enlazar nodo anterior con el nodo siguiente del nodo a eliminar
+	listaAux->siguiente = juegoSuprimir->siguiente;
+
+ 	printf("\nJuego eliminado de la posicion %d: %s",posicion, juegoSuprimir->datos.titulo);
+
+	free(juegoSuprimir);
+}
+
 // Punto i)
 void mostrarLista(tNodo** cabecera){
 	if (estaLaListaVacia(cabecera)) {
-    return;
+    printf("Error: no se puede mostrar la lista por que esta vacia.");
+		return;
   }
 
   tNodo* aux = *cabecera;
@@ -233,7 +257,6 @@ void mostrarLista(tNodo** cabecera){
     pos++;
   }
 }
-
 
 // Menú
 void mostrarOpcionesMenu(){
@@ -268,7 +291,7 @@ void crearMenu(tNodo** cabecera) {
             inicializarLista(cabecera); 
             break;
           case 'b': 
-            estaLaListaVacia(cabecera); 
+            preguntarSiLaListaEstaVacia(cabecera); 
             break;
           case 'c': 
             insertarPrimerJuego(cabecera); 
@@ -281,6 +304,9 @@ void crearMenu(tNodo** cabecera) {
             break;
 					case 'f': 
             pop(cabecera); 
+            break;
+					case 'g': 
+            eliminarJuegoEnPos(cabecera); 
             break;
 					case 'i': 
             mostrarLista(cabecera); 
