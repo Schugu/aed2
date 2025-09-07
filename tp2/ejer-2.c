@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <ctype.h>
 #define MAXSTRING 50
 
 // Tipos 
@@ -48,6 +49,7 @@ void push(tNodo**);
 void insertarJuegoEnPos(tNodo**);
 void pop(tNodo**);
 void eliminarJuegoEnPos(tNodo**);
+void buscarPorId(tNodo**);
 void mostrarLista(tNodo**);
 void crearMenu(tNodo**);
 tDatosJuego ingresarDatos();
@@ -55,8 +57,8 @@ tNodo* crearNodo(tDatosJuego, tNodo*);
 void mostrarOpcionesMenu();
 void mostrarDatos(tDatosJuego);
 
-// Funcion principal 
 int main (){
+	// Funcion principal 
 	crearMenu(&cabecera);
 
 	return 0;
@@ -178,7 +180,7 @@ void mostrarDatos(tDatosJuego juego){
 	printf("ID: %d\n", juego.id);
 	printf("Titulo: %s\n", juego.titulo);
 	printf("Anio de lanzamiento: %d\n", juego.anioLanzamiento);
-	printf("Precio: $%.2f\n", juego.precio);
+	printf("Precio: $%.2f", juego.precio);
 }
 
 // Punto f)
@@ -241,6 +243,38 @@ void eliminarJuegoEnPos(tNodo** cabecera){
 	free(juegoSuprimir);
 }
 
+// Punto h)
+void buscarPorId(tNodo** cabecera){
+	if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se puede buscar por ID, la lista por que esta vacia.");
+		return;
+  }
+
+	int busqueda = -123;
+	printf("Ingrese un ID: ");
+	scanf("%d", &busqueda);
+
+	// Validar busqyeda
+	if (busqueda < 0) {
+		printf("\nID invalido\n");
+		return;
+	}
+
+  tNodo* aux = *cabecera;
+  int pos = 0;
+  while (aux){
+		if(aux->datos.id == busqueda){
+			mostrarDatos(aux->datos);
+			printf("\nPosicion: %d", pos);
+			return;
+		}
+    aux = aux->siguiente;
+    pos++;
+  }
+	printf("No se encontraron resultaodos...");
+	return;
+}
+
 // Punto i)
 void mostrarLista(tNodo** cabecera){
 	if (estaLaListaVacia(cabecera)) {
@@ -251,7 +285,7 @@ void mostrarLista(tNodo** cabecera){
   tNodo* aux = *cabecera;
   int pos = 0;
   while (aux != NULL){
-    printf("\n--- Juego en posicion %d ---\n", pos);
+    printf("\n\n--- Juego en posicion %d ---\n", pos);
     mostrarDatos(aux->datos);
     aux = aux->siguiente;
     pos++;
@@ -260,7 +294,7 @@ void mostrarLista(tNodo** cabecera){
 
 // Menú
 void mostrarOpcionesMenu(){
-	printf("\n\n===============| Menu |===============\n");
+	printf("\n\n========================| Menu |========================\n");
 	printf("[a]: Inicializar la lista (establecer puntero en NULL).\n");
 	printf("[b]: Verificar si una lista esta vacia.\n");
 	printf("[c]: Insertar el primer videojuego (nodo) de la lista.\n");
@@ -272,6 +306,7 @@ void mostrarOpcionesMenu(){
 	printf("[i]: Visualizar todos los videojuegos de la lista.\n");
 	printf("[j]: Contar la cantidad total de videojuegos.\n");
 	printf("[k]: Liberar completamente la memoria de la lista.\n");
+	printf("[x]: Salir.\n\n");
 }
 
 // Menú
@@ -283,7 +318,8 @@ void crearMenu(tNodo** cabecera) {
         mostrarOpcionesMenu();
 				fflush(stdin);
 				printf("Seleccione una opcion: ");
-        scanf(" %c", &opcion); 
+        scanf(" %c", (&opcion)); 
+				opcion = tolower(opcion);
 				printf("\n\n");
 
         switch (opcion) {
@@ -307,6 +343,9 @@ void crearMenu(tNodo** cabecera) {
             break;
 					case 'g': 
             eliminarJuegoEnPos(cabecera); 
+            break;
+					case 'h': 
+            buscarPorId(cabecera); 
             break;
 					case 'i': 
             mostrarLista(cabecera); 
