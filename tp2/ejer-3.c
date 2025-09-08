@@ -24,6 +24,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Constante
 #define MAXSTRING 50
@@ -45,23 +46,30 @@ typedef struct nodo {
 } tNodo;
 
 // Prototipado
+// Punto a)
 void inicializarLista(tNodo**);
 
-// Punto b
+// Punto b)
 void insertarPrimero(tNodo**);
 void push(tNodo**);
 void insertarEnPos(tNodo**);
 void insertarAlFinal(tNodo**);
 
-// Punto c
+// Punto c)
 void pop(tNodo**);
 void eliminarEnPos(tNodo**);
 void eliminarAlFinal(tNodo**);
 void eliminarPorId(tNodo**);
 
-bool estaLaListaVacia(tNodo**);
+// Punto d)
 void mostrarDatos(tDatosCancion);
 void mostrarLista(tNodo**);
+
+// Punto e)
+void convertirMinuscula(tString);
+void buscarPorTitulo(tNodo**);
+
+bool estaLaListaVacia(tNodo**);
 
 void mostrarOpcionesMenu();
 void mostrarOpcionesMenuAgregar();
@@ -302,7 +310,7 @@ void eliminarPorId(tNodo** cabecera) {
 
   while (aux != NULL) {
     if (aux->datos.id == busqueda) {
-      mostrarDatos(aux->datos);  
+      mostrarDatos(aux->datos);
 
       if (auxAnterior == NULL) {
         *cabecera = aux->siguiente;
@@ -346,6 +354,43 @@ void mostrarLista(tNodo** cabecera) {
     aux = aux->siguiente;
     pos++;
   }
+}
+
+// Punto e)
+void convertirMinuscula(tString string) {
+  for (int i = 0; string[i] != '\0'; i++) {
+    string[i] = tolower(string[i]);
+  }
+}
+
+void buscarPorTitulo(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf(
+        "Error: no se puede buscar por titulo, la lista por que esta vacia.");
+    return;
+  }
+
+  tString busqueda;
+  printf("Ingrese un titulo: ");
+  scanf(" %49[^\n]", busqueda);
+  convertirMinuscula(busqueda);
+
+  tNodo* aux = *cabecera;
+  int pos = 0;
+  while (aux) {
+    tString auxTitulo;
+    strcpy(auxTitulo, aux->datos.titulo);
+    convertirMinuscula(auxTitulo);
+    if (strcmp(auxTitulo, busqueda) == 0) {
+      mostrarDatos(aux->datos);
+      printf("\nPosicion: %d", pos);
+      return;
+    }
+    aux = aux->siguiente;
+    pos++;
+  }
+  printf("No se encontraron resultaodos...");
+  return;
 }
 
 void mostrarOpcionesMenu() {
@@ -469,6 +514,9 @@ void crearMenu(tNodo** cabecera) {
         break;
       case 'd':
         mostrarLista(cabecera);
+        break;
+      case 'e':
+        buscarPorTitulo(cabecera);
         break;
       case 'x':
         salir = true;
