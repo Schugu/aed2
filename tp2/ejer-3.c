@@ -47,10 +47,16 @@ typedef struct nodo {
 // Prototipado
 void inicializarLista(tNodo**);
 
+// Punto b
+void insertarPrimero(tNodo**);
+void push(tNodo**);
+void insertarEnPos(tNodo**);
+void insertarAlFinal(tNodo**);
+
 bool estaLaListaVacia(tNodo**);
 void mostrarLista(tNodo**);
 
-void mostrarOpcionesMenu(); 
+void mostrarOpcionesMenu();
 void mostrarOpcionesMenuAgregar();
 void mostrarOpcionesMenuEliminar();
 void crearMenuAgregar(tNodo**);
@@ -70,72 +76,140 @@ int main() {
 // Funciones
 // Punta a)
 void inicializarLista(tNodo** cabecera) {
-	*cabecera = NULL;
-	printf("Lista inicializada!\n");
+  *cabecera = NULL;
+  printf("Lista inicializada!\n");
 }
 
-bool estaLaListaVacia(tNodo** cabecera){
-	return (*cabecera == NULL) ? true : false;
+bool estaLaListaVacia(tNodo** cabecera) {
+  return (*cabecera == NULL) ? true : false;
 }
 
 // Punto b)
-tDatosCancion ingresarDatos(){
-	tDatosCancion cancion;
+tDatosCancion ingresarDatos() {
+  tDatosCancion cancion;
 
-	printf("Ingrese los datos de la cancion: \n");
-	printf("ID: ");
-	scanf("%d", &cancion.id);
+  printf("Ingrese los datos de la cancion: \n");
+  printf("ID: ");
+  scanf("%d", &cancion.id);
 
-	printf("Titulo: ");
-	scanf(" %49[^\n]", cancion.titulo);
+  printf("Titulo: ");
+  scanf(" %49[^\n]", cancion.titulo);
 
   printf("Artista: ");
-	scanf(" %49[^\n]", cancion.artista); 
-  
-	printf("Duracion en segundo: ");
-	scanf("%d", &cancion.duracionSegundos);
+  scanf(" %49[^\n]", cancion.artista);
+
+  printf("Duracion en segundo: ");
+  scanf("%d", &cancion.duracionSegundos);
 
   printf("Genero: ");
-	scanf(" %49[^\n]", cancion.genero);
+  scanf(" %49[^\n]", cancion.genero);
 
-	return cancion;
+  return cancion;
 }
 
-// Crear Nodo
-tNodo* crearNodo(tDatosCancion cancion, tNodo* enlace){
-	tNodo* nodo;
+tNodo* crearNodo(tDatosCancion elemento, tNodo* enlace) {
+  tNodo* nodo;
 
-	nodo = (tNodo*) malloc(sizeof(tNodo));
+  nodo = (tNodo*)malloc(sizeof(tNodo));
 
-	if (nodo == NULL) {
-		printf("Error al asignar memoria");
+  if (nodo == NULL) {
+    printf("Error al asignar memoria");
+  }
+
+  nodo->datos = elemento;
+  nodo->siguiente = enlace;
+
+  return nodo;
+}
+
+// Punto b.1)
+void insertarPrimero(tNodo** cabecera) {
+  tDatosCancion elemento = ingresarDatos();
+
+  tNodo* nuevoNodo = crearNodo(elemento, NULL);
+
+  *cabecera = nuevoNodo;
+}
+
+// Punto b.2)
+void push(tNodo** cabecera) {
+  tDatosCancion elemento = ingresarDatos();
+
+  tNodo* nuevoNodo = crearNodo(elemento, *cabecera);
+
+  *cabecera = nuevoNodo;
+}
+
+// Punto b.3)
+void insertarEnPos(tNodo** cabecera) {
+  int posicion = 0;
+  printf("Ingrese la posicion de ingreso: ");
+  scanf("%d", &posicion);
+
+  if (posicion < 0) {
+    printf("\nPosicion invalida\n");
+    return;
+  }
+
+  if (posicion == 0) {
+    tDatosCancion elemento = ingresarDatos();
+
+    tNodo* nuevoNodo = crearNodo(elemento, *cabecera);
+
+    *cabecera = nuevoNodo;
+    return;
+  }
+
+  tNodo* listaAux = *cabecera;
+  for (int i = 1; i < posicion - 1 && listaAux != NULL; i++) {
+    listaAux = listaAux->siguiente;
+  }
+  if (listaAux == NULL) {
+    printf("Error: La posicion es mayor al tamanio de la lista.\n");
+    return;
+  }
+  tDatosCancion elemento = ingresarDatos();
+  tNodo* nuevoNodo = crearNodo(elemento, listaAux->siguiente);
+  listaAux->siguiente = nuevoNodo;
+  printf("\nElemento insertado en la posicion %d: %s", posicion, elemento.titulo);
+}
+
+// Punto b.4)
+void insertarAlFinal(tNodo** cabecera){
+	tDatosCancion elemento = ingresarDatos();
+	tNodo* nuevoNodo = crearNodo(elemento, NULL);
+
+	if (!*cabecera){
+		*cabecera = nuevoNodo;
+	} else {
+    tNodo* aux = *cabecera;
+    while (aux->siguiente) {
+			aux = aux->siguiente;
+    }
+
+    aux->siguiente = nuevoNodo;
 	}
-
-	nodo->datos = cancion;
-	nodo->siguiente = enlace;	
-
-	return nodo;
+  printf("\nElemento insertado al final de la lista con exito!\n");
 }
-
 
 // Punto d)
-void mostrarDatos(tDatosCancion cancion){
-	printf("ID: %d\n", cancion.id);
-	printf("Titulo: %s\n", cancion.titulo);
-	printf("Artista: %s\n", cancion.artista);
-	printf("Anio de lanzamiento: %d\n", cancion.duracionSegundos);
-	printf("Genero: %s\n", cancion.genero);
+void mostrarDatos(tDatosCancion cancion) {
+  printf("ID: %d\n", cancion.id);
+  printf("Titulo: %s\n", cancion.titulo);
+  printf("Artista: %s\n", cancion.artista);
+  printf("Anio de lanzamiento: %d\n", cancion.duracionSegundos);
+  printf("Genero: %s", cancion.genero);
 }
 
-void mostrarLista(tNodo** cabecera){
-	if (estaLaListaVacia(cabecera)) {
+void mostrarLista(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
     printf("Error: no se puede mostrar la lista por que esta vacia.");
-		return;
+    return;
   }
 
   tNodo* aux = *cabecera;
   int pos = 0;
-  while (aux != NULL){
+  while (aux != NULL) {
     printf("\n\n--- Cancion en posicion %d ---\n", pos);
     mostrarDatos(aux->datos);
     aux = aux->siguiente;
@@ -186,8 +260,18 @@ void crearMenuAgregar(tNodo** cabecera) {
     printf("\n\n");
 
     switch (opcion) {
-      // case 2: preguntarSiLaListaEstaVacia(cabecera); break;
-      // case 3: insertarPrimerJuego(cabecera); break;
+      case 1:
+        insertarPrimero(cabecera);
+        break;
+      case 2:
+        push(cabecera);
+        break;
+      case 3:
+        insertarEnPos(cabecera);
+        break;
+      case 4:
+        insertarAlFinal(cabecera);
+        break;
       case 5:
         salir = true;
         break;
