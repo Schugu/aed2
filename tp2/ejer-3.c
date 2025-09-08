@@ -53,7 +53,14 @@ void push(tNodo**);
 void insertarEnPos(tNodo**);
 void insertarAlFinal(tNodo**);
 
+// Punto c
+void pop(tNodo**);
+void eliminarEnPos(tNodo**);
+void eliminarAlFinal(tNodo**);
+void eliminarPorId(tNodo**);
+
 bool estaLaListaVacia(tNodo**);
+void mostrarDatos(tDatosCancion);
 void mostrarLista(tNodo**);
 
 void mostrarOpcionesMenu();
@@ -171,25 +178,149 @@ void insertarEnPos(tNodo** cabecera) {
   tDatosCancion elemento = ingresarDatos();
   tNodo* nuevoNodo = crearNodo(elemento, listaAux->siguiente);
   listaAux->siguiente = nuevoNodo;
-  printf("\nElemento insertado en la posicion %d: %s", posicion, elemento.titulo);
+  printf("\nElemento insertado en la posicion %d: %s", posicion,
+         elemento.titulo);
 }
 
 // Punto b.4)
-void insertarAlFinal(tNodo** cabecera){
-	tDatosCancion elemento = ingresarDatos();
-	tNodo* nuevoNodo = crearNodo(elemento, NULL);
+void insertarAlFinal(tNodo** cabecera) {
+  tDatosCancion elemento = ingresarDatos();
+  tNodo* nuevoNodo = crearNodo(elemento, NULL);
 
-	if (!*cabecera){
-		*cabecera = nuevoNodo;
-	} else {
+  if (!*cabecera) {
+    *cabecera = nuevoNodo;
+  } else {
     tNodo* aux = *cabecera;
     while (aux->siguiente) {
-			aux = aux->siguiente;
+      aux = aux->siguiente;
     }
 
     aux->siguiente = nuevoNodo;
-	}
+  }
   printf("\nElemento insertado al final de la lista con exito!\n");
+}
+
+// Punto c.1)
+void pop(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: No se puede eliminar por que la lista esta vacia.");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+
+  *cabecera = aux->siguiente;
+
+  free(aux);
+
+  printf("Primer elemento eliminado.\n");
+}
+
+// Punto c.2)
+void eliminarEnPos(tNodo** cabecera) {
+  int posicion = 0;
+  printf("Ingrese la posicion de egreso: ");
+  scanf("%d", &posicion);
+
+  if (posicion < 0) {
+    printf("\nPosicion invalida\n");
+    return;
+  }
+
+  if (posicion == 0) {
+    pop(cabecera);
+    printf("Elemento eliminado exitosamente de la posicion: %d", posicion);
+    return;
+  }
+
+  tNodo* listaAux = *cabecera;
+  for (int i = 1; i < posicion - 1 && listaAux != NULL; i++) {
+    listaAux = listaAux->siguiente;
+  }
+
+  if (!listaAux || !listaAux->siguiente) {
+    printf("Error: La posicion es mayor al tamanio de la lista.\n");
+    return;
+  }
+
+  tNodo* elementoSuprimir = listaAux->siguiente;
+
+  listaAux->siguiente = elementoSuprimir->siguiente;
+
+  printf("\nElemento eliminado de la posicion %d: %s", posicion,
+         elementoSuprimir->datos.titulo);
+
+  free(elementoSuprimir);
+}
+
+// Punto c.3)
+void eliminarAlFinal(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: No se puede eliminar porque la lista está vacía.\n");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  tNodo* auxAnterior = NULL;
+
+  // Caso especial: solo hay un nodo
+  if (aux->siguiente == NULL) {
+    free(aux);
+    *cabecera = NULL;  // la lista queda vacía
+    printf("\nElemento eliminado del final de la lista con éxito!\n");
+    return;
+  }
+
+  while (aux->siguiente != NULL) {
+    auxAnterior = aux;
+    aux = aux->siguiente;
+  }
+
+  auxAnterior->siguiente = NULL;
+  printf("\nElemento eliminado del final de la lista con éxito!\n");
+}
+
+// Punto c.4)
+void eliminarPorId(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se puede eliminar por ID porque la lista está vacía.\n");
+    return;
+  }
+
+  int busqueda;
+  printf("Ingrese un ID: ");
+  scanf("%d", &busqueda);
+
+  if (busqueda < 0) {
+    printf("\nID inválido\n");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  tNodo* auxAnterior = NULL;
+  int pos = 0;
+
+  while (aux != NULL) {
+    if (aux->datos.id == busqueda) {
+      mostrarDatos(aux->datos);  
+
+      if (auxAnterior == NULL) {
+        *cabecera = aux->siguiente;
+      } else {
+        auxAnterior->siguiente = aux->siguiente;
+      }
+
+      free(aux);
+      printf("\nElemento con ID %d eliminado en posición %d\n", busqueda, pos);
+      return;
+    }
+
+    auxAnterior = aux;
+    aux = aux->siguiente;
+    pos++;
+  }
+
+  printf("No se encontraron resultados para ID %d...\n", busqueda);
 }
 
 // Punto d)
@@ -246,7 +377,8 @@ void mostrarOpcionesMenuEliminar() {
   printf("[1]: Cancion al principio de la playlist (pop).\n");
   printf("[2]: Cancion de una posicion especifica de la playlist.\n");
   printf("[3]: Cancion al final de la playlist.\n");
-  printf("[4]: Volver.\n");
+  printf("[4]: Cancion por ID de la playlist.\n");
+  printf("[5]: Volver.\n");
 }
 
 void crearMenuAgregar(tNodo** cabecera) {
@@ -292,10 +424,19 @@ void crearMenuEliminar(tNodo** cabecera) {
     printf("\n\n");
 
     switch (opcion) {
-      // case 1: inicializarLista(cabecera); break;
-      // case 2: preguntarSiLaListaEstaVacia(cabecera); break;
-      // case 3: insertarPrimerJuego(cabecera); break;
+      case 1:
+        pop(cabecera);
+        break;
+      case 2:
+        eliminarEnPos(cabecera);
+        break;
+      case 3:
+        eliminarAlFinal(cabecera);
+        break;
       case 4:
+        eliminarPorId(cabecera);
+        break;
+      case 5:
         salir = true;
         break;
       default:
