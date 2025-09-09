@@ -45,6 +45,11 @@ typedef struct nodo {
   struct nodo* siguiente;
 } tNodo;
 
+typedef struct {
+  int pos;
+  int duracion;
+} tMinMaxCancion;
+
 // Prototipado
 // Punto a)
 void inicializarLista(tNodo**);
@@ -70,6 +75,7 @@ void convertirMinuscula(tString);
 void buscarPorTitulo(tNodo**);
 
 // Punto f)
+void mostrarNodoPorPos(tNodo**, int);
 void calcularDuracionTotal(tNodo**);
 
 bool estaLaListaVacia(tNodo**);
@@ -339,7 +345,7 @@ void mostrarDatos(tDatosCancion cancion) {
   printf("ID: %d\n", cancion.id);
   printf("Titulo: %s\n", cancion.titulo);
   printf("Artista: %s\n", cancion.artista);
-  printf("Anio de lanzamiento: %d\n", cancion.duracionSegundos);
+  printf("Duracion en segundos: %d\n", cancion.duracionSegundos);
   printf("Genero: %s", cancion.genero);
 }
 
@@ -414,6 +420,51 @@ void calcularDuracionTotal(tNodo** cabecera) {
   }
 
   printf("Duracion total de la playlist en segundos: %d", acumulador);
+}
+
+void mostrarNodoPorPos(tNodo** cabecera, int pos) {
+  tNodo* aux = *cabecera;
+
+  for (int i = 0; i < pos; i++) {
+    aux = aux->siguiente;
+  }
+  mostrarDatos(aux->datos);
+}
+
+// Punto g
+void calcularMaxYMin(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se puede calcular por que la lista esta vacia.");
+    return;
+  };
+
+  tMinMaxCancion minimo;
+  tMinMaxCancion maximo;
+
+  tNodo* aux = *cabecera;
+  int pos = 0;
+  minimo.duracion = aux->datos.duracionSegundos;
+  minimo.pos = 0;
+  maximo.duracion = aux->datos.duracionSegundos;
+  maximo.pos = 0;
+
+  while (aux) {
+    if (aux->datos.duracionSegundos > maximo.duracion) {
+      maximo.duracion = aux->datos.duracionSegundos;
+      maximo.pos = pos;
+    } else if (aux->datos.duracionSegundos < minimo.duracion) {
+      minimo.duracion = aux->datos.duracionSegundos;
+      minimo.pos = pos;
+    }
+    aux = aux->siguiente;
+    pos++;
+  }
+
+  printf("La cancion mas corta de la playlist es: \n");
+  mostrarNodoPorPos(cabecera, minimo.pos);
+
+  printf("\nLa cancion mas larga de la playlist es: \n");
+  mostrarNodoPorPos(cabecera, maximo.pos);
 }
 
 void mostrarOpcionesMenu() {
@@ -543,6 +594,9 @@ void crearMenu(tNodo** cabecera) {
         break;
       case 'f':
         calcularDuracionTotal(cabecera);
+        break;
+      case 'g':
+        calcularMaxYMin(cabecera);
         break;
       case 'x':
         salir = true;
