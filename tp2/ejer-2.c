@@ -312,7 +312,7 @@ void liberarMemoriaTotal(tNodo** cabecera){
   while (aux){
 		tNodo* siguiente = aux->siguiente;
 		free(aux);
-    aux = aux->siguiente;
+    aux = siguiente;
   }
 	*cabecera = NULL;
   printf("\nMemoria liberada exitosamente!\n");

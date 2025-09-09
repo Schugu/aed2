@@ -525,9 +525,9 @@ void buscarCancionesPorArtista(tNodo** cabecera) {
 void liberarMemoriaTotal(tNodo** cabecera) {
   tNodo* aux = *cabecera;
   while (aux) {
-    // tNodo* siguiente = aux->siguiente;
+    tNodo* siguiente = aux->siguiente;
     free(aux);
-    aux = aux->siguiente;
+    aux = siguiente;
   }
   *cabecera = NULL;
   printf("\nMemoria liberada exitosamente!\n");
