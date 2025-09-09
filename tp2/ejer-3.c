@@ -69,6 +69,9 @@ void mostrarLista(tNodo**);
 void convertirMinuscula(tString);
 void buscarPorTitulo(tNodo**);
 
+// Punto f)
+void calcularDuracionTotal(tNodo**);
+
 bool estaLaListaVacia(tNodo**);
 
 void mostrarOpcionesMenu();
@@ -393,6 +396,26 @@ void buscarPorTitulo(tNodo** cabecera) {
   return;
 }
 
+// Punto f)
+void calcularDuracionTotal(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf(
+        "Error: no se puede calcular duracion total, la lista por que esta "
+        "vacia.");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  int acumulador = 0;
+
+  while (aux) {
+    acumulador += aux->datos.duracionSegundos;
+    aux = aux->siguiente;
+  }
+
+  printf("Duracion total de la playlist en segundos: %d", acumulador);
+}
+
 void mostrarOpcionesMenu() {
   printf("\n\n========================| Menu |========================\n");
   printf("[a]: Inicializar la playlist.\n");
@@ -517,6 +540,9 @@ void crearMenu(tNodo** cabecera) {
         break;
       case 'e':
         buscarPorTitulo(cabecera);
+        break;
+      case 'f':
+        calcularDuracionTotal(cabecera);
         break;
       case 'x':
         salir = true;
