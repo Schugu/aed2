@@ -55,6 +55,7 @@ typedef struct {
 void inicializarLista(tNodo**);
 
 // Punto b)
+bool estaLaListaVacia(tNodo**);
 void insertarPrimero(tNodo**);
 void push(tNodo**);
 void insertarEnPos(tNodo**);
@@ -84,8 +85,13 @@ void calcularMaxYMin(tNodo**);
 // Punto h)
 void buscarCancionesPorArtista(tNodo**);
 
-bool estaLaListaVacia(tNodo**);
+// Punto i)
+void liberarMemoriaTotal(tNodo**);
 
+// Punto j)
+void contarCancionesPorGenero(tNodo**);
+
+// Mneú
 void mostrarOpcionesMenu();
 void mostrarOpcionesMenuAgregar();
 void mostrarOpcionesMenuEliminar();
@@ -515,6 +521,43 @@ void buscarCancionesPorArtista(tNodo** cabecera) {
   }
 }
 
+// Punto i)
+void liberarMemoriaTotal(tNodo** cabecera) {
+  tNodo* aux = *cabecera;
+  while (aux) {
+    // tNodo* siguiente = aux->siguiente;
+    free(aux);
+    aux = aux->siguiente;
+  }
+  *cabecera = NULL;
+  printf("\nMemoria liberada exitosamente!\n");
+}
+
+// Punto j)
+void contarCancionesPorGenero(tNodo** cabecera) {
+  tString busqueda;
+  printf("Ingrese el genero: ", busqueda);
+  scanf(" %49[^\n]", busqueda);
+  convertirMinuscula(busqueda);
+
+  tNodo* aux = *cabecera;
+  int contador = 0;
+
+  while (aux) {
+    tString auxGenero;
+    strcpy(auxGenero, aux->datos.genero);
+    convertirMinuscula(auxGenero);
+
+    if (strcmp(auxGenero, busqueda) == 0) {
+      contador++;
+    }
+
+    aux = aux->siguiente;
+  }
+
+  printf("Total de canciones para el genero %s: %d", busqueda, contador);
+}
+
 void mostrarOpcionesMenu() {
   printf("\n\n========================| Menu |========================\n");
   printf("[a]: Inicializar la playlist.\n");
@@ -648,6 +691,12 @@ void crearMenu(tNodo** cabecera) {
         break;
       case 'h':
         buscarCancionesPorArtista(cabecera);
+        break;
+      case 'i':
+        liberarMemoriaTotal(cabecera);
+        break;
+      case 'j':
+        contarCancionesPorGenero(cabecera);
         break;
       case 'x':
         salir = true;
