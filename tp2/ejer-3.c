@@ -78,6 +78,12 @@ void buscarPorTitulo(tNodo**);
 void mostrarNodoPorPos(tNodo**, int);
 void calcularDuracionTotal(tNodo**);
 
+// Punto g)
+void calcularMaxYMin(tNodo**);
+
+// Punto h)
+void buscarCancionesPorArtista(tNodo**);
+
 bool estaLaListaVacia(tNodo**);
 
 void mostrarOpcionesMenu();
@@ -467,6 +473,48 @@ void calcularMaxYMin(tNodo** cabecera) {
   mostrarNodoPorPos(cabecera, maximo.pos);
 }
 
+void buscarCancionesPorArtista(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf(
+        "Error: no se pueden listar las canciones por artista por que la lista "
+        "esta vacia.");
+    return;
+  }
+
+  tString busqueda;
+  printf("Ingrese el artista: ", busqueda);
+  scanf(" %49[^\n]", busqueda);
+  convertirMinuscula(busqueda);
+
+  tNodo* aux = *cabecera;
+  tNodo* cancionesArtista = NULL;
+  while (aux) {
+    tString auxArtista;
+    strcpy(auxArtista, aux->datos.artista);
+    convertirMinuscula(busqueda);
+
+    if (strcmp(auxArtista, busqueda) == 0) {
+      if (cancionesArtista == NULL) {
+        tNodo* nuevoNodo = crearNodo(aux->datos, NULL);
+
+        cancionesArtista = nuevoNodo;
+      } else {
+        tNodo* nuevoNodo = crearNodo(aux->datos, cancionesArtista);
+
+        cancionesArtista = nuevoNodo;
+      }
+    }
+    aux = aux->siguiente;
+  }
+
+  if (cancionesArtista == NULL) {
+    printf("No se encontraron resultados...");
+  } else {
+    printf("Canciones encontradas del artista: %s", busqueda);
+    mostrarLista(&cancionesArtista);
+  }
+}
+
 void mostrarOpcionesMenu() {
   printf("\n\n========================| Menu |========================\n");
   printf("[a]: Inicializar la playlist.\n");
@@ -597,6 +645,9 @@ void crearMenu(tNodo** cabecera) {
         break;
       case 'g':
         calcularMaxYMin(cabecera);
+        break;
+      case 'h':
+        buscarCancionesPorArtista(cabecera);
         break;
       case 'x':
         salir = true;
