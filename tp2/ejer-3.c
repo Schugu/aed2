@@ -657,7 +657,7 @@ void crearMenuEliminar(tNodo** cabecera) {
 
 void crearMenu(tNodo** cabecera) {
   char opcion;
-  char salir = false;
+  bool salir = false;
 
   do {
     mostrarOpcionesMenu();
