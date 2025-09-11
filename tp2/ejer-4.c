@@ -30,28 +30,31 @@
 
 // Librerias
 #include <ctype.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Constante
+// Constantes
 #define MAXSTRING 50
+
 // Tipos
 typedef char tString[MAXSTRING];
 
-tString arrayEstadoPedido[4] = {"Pendiente", "Preparando", "En camino",
-                                "Entregado"};
+tString arrayEstadoPedido[4] = {"Pendiente", "Preparando", "En camino", "Entregado"};
+
 // Tipos
 typedef struct {
   int numero;
-  tString nombreCLiente;
+  tString nombreCliente;
   tString direccion;
   tString telefono;
   float montoTotal;
   tString estadoPedido;
+  float costoEnvio;
   int tiempoEstimado;
-
+  tString prioridad;
 } tDatosPedido;
 
 typedef struct nodo {
@@ -64,8 +67,18 @@ typedef struct nodo {
 tNodo* crearNodo(tDatosPedido, tNodo*);
 void elegirEstadoPedido(tString);
 tDatosPedido ingresarDatos();
-void push(tNodo** cabecera);
+void push(tNodo**);
 
+// Punto d)
+bool estaLaListaVacia(tNodo**);
+void mostrarDatos(tDatosPedido);
+void mostrarLista(tNodo**);
+void convertirMinuscula(tString);
+void buscarPorCliente(tNodo**);
+
+// Menú
+void mostrarOpcionesMenuMuestra();
+void crearMenuMuestra(tNodo**);
 void mostrarOpciones();
 void crearMenu(tNodo**);
 
@@ -84,35 +97,38 @@ int main() {
 void elegirEstadoPedido(tString estado) {
   printf("Elija el estado del pedido: \n");
   for (int i = 0; i < 4; i++) {
-    printf("[%d]: ", (i + 1));
-    printf("%s\n", arrayEstadoPedido[i]);
+    printf("[%d]: %s\n", i + 1, arrayEstadoPedido[i]);
   }
 
-  bool salir = true;
+  int opcion;
+  bool valido = false;
+
   do {
-    int opcion = 0;
+    printf("Ingrese la opcion: ");
     scanf("%d", &opcion);
 
     switch (opcion) {
-      case 1:
-        estado = arrayEstadoPedido[0];
-        break;
-      case 2:
-        estado = arrayEstadoPedido[1];
-        break;
-      case 3:
-        estado = arrayEstadoPedido[2];
-        break;
-      case 4:
-        estado = arrayEstadoPedido[3];
-        break;
-
-      default:
-        printf("Opcion invalida, porfavor ingresela de nuevo.");
-        salir = false;
-        break;
+    case 1:
+      strcpy(estado, arrayEstadoPedido[0]);
+      valido = true;
+      break;
+    case 2:
+      strcpy(estado, arrayEstadoPedido[1]);
+      valido = true;
+      break;
+    case 3:
+      strcpy(estado, arrayEstadoPedido[2]);
+      valido = true;
+      break;
+    case 4:
+      strcpy(estado, arrayEstadoPedido[3]);
+      valido = true;
+      break;
+    default:
+      printf("Opcion invalida, por favor ingresela de nuevo.\n");
+      break;
     }
-  } while (!salir);
+  } while (!valido);
 }
 
 tDatosPedido ingresarDatos() {
@@ -124,7 +140,7 @@ tDatosPedido ingresarDatos() {
   scanf("%d", &elemento.numero);
 
   printf("Nombre del cliente: ");
-  scanf(" %49[^\n]", elemento.nombreCLiente);
+  scanf(" %49[^\n]", elemento.nombreCliente);
 
   printf("Direccion: ");
   scanf(" %49[^\n]", elemento.direccion);
@@ -133,15 +149,27 @@ tDatosPedido ingresarDatos() {
   scanf(" %49[^\n]", elemento.telefono);
 
   printf("Monto total: ");
-  scanf("%f", elemento.montoTotal);
+  scanf("%f", &elemento.montoTotal);
+
+  if (elemento.montoTotal >= 3000) {
+    elemento.costoEnvio = 0;
+  } else {
+    elemento.costoEnvio = 500;
+  }
+
+  elemento.tiempoEstimado = 30 + ((int)(elemento.montoTotal / 1000)) * 5;
 
   elegirEstadoPedido(elemento.estadoPedido);
 
-  printf("Tiempo estimado en minutos: ");
-  scanf("%f", elemento.tiempoEstimado);
+  if (elemento.montoTotal > 5000) {
+    strcpy(elemento.prioridad, "Alta");
+  } else {
+    strcpy(elemento.prioridad, "Normal");
+  }
 
   return elemento;
 }
+
 tNodo* crearNodo(tDatosPedido elemento, tNodo* enlace) {
   tNodo* nodo;
 
@@ -156,9 +184,8 @@ tNodo* crearNodo(tDatosPedido elemento, tNodo* enlace) {
 
   return nodo;
 }
-void push(tNodo** cabecera) {
-  tDatosPedido elemento = ingresarDatos();
 
+void insertarNodo(tNodo** cabecera, tDatosPedido elemento) {
   tNodo* nuevoNodo;
   if (!*cabecera) {
     nuevoNodo = crearNodo(elemento, NULL);
@@ -169,30 +196,135 @@ void push(tNodo** cabecera) {
   *cabecera = nuevoNodo;
 }
 
-// Menú
+void push(tNodo** cabecera) {
+  tDatosPedido elemento = ingresarDatos();
+  insertarNodo(cabecera, elemento);
+}
+
+// Punto d)
+bool estaLaListaVacia(tNodo** cabecera) {
+  return (*cabecera == NULL) ? true : false;
+}
+void mostrarDatos(tDatosPedido pedido) {
+  printf("Numero de pedido: %d\n", pedido.numero);
+  printf("Cliente: %s\n", pedido.nombreCliente);
+  printf("Direccion: %s\n", pedido.direccion);
+  printf("Telefono: %s\n", pedido.telefono);
+  printf("Monto total: $%.2f\n", pedido.montoTotal);
+  printf("Estado del pedido: %s\n", pedido.estadoPedido);
+  printf("Costo de envio: $%.2f\n", pedido.costoEnvio);
+  printf("Tiempo estimado: %d minutos\n", pedido.tiempoEstimado);
+  printf("Prioridad: %s", pedido.prioridad);
+}
+
+// Punto d.1)
+void mostrarLista(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se puede mostrar la lista por que esta vacia.");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  int pos = 0;
+  while (aux != NULL) {
+    printf("\n\n--- Pedido en posicion %d ---\n", pos);
+    mostrarDatos(aux->datos);
+    aux = aux->siguiente;
+    pos++;
+  }
+}
+
+// Punto d.2)
+void convertirMinuscula(tString string) {
+  for (int i = 0; string[i] != '\0'; i++) {
+    string[i] = tolower(string[i]);
+  }
+}
+
+void buscarPorCliente(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf(
+        "Error: no se puede buscar, la lista por que esta vacia.");
+    return;
+  }
+
+  tString busqueda;
+  printf("Ingrese el nombre del cliente: ");
+  scanf(" %49[^\n]", busqueda);
+  convertirMinuscula(busqueda);
+
+  tNodo* aux = *cabecera;
+  int pos = 0;
+  while (aux) {
+    tString auxTitulo;
+    strcpy(auxTitulo, aux->datos.nombreCliente);
+    convertirMinuscula(auxTitulo);
+    if (strcmp(auxTitulo, busqueda) == 0) {
+      mostrarDatos(aux->datos);
+      printf("\nPosicion: %d", pos);
+      return;
+    }
+    aux = aux->siguiente;
+    pos++;
+  }
+  printf("No se encontraron resultaodos...");
+  return;
+}
+
+void mostrarOpcionesMenuMuestra() {
+  printf("\n\n========================| Muestra y busqueda |========================\n");
+  printf("[1]: Todos los pedidos.\n");
+  printf("[2]: Pedidos por cliente.\n");
+  printf("[3]: Pedidos por prioridad.\n");
+  printf("[4]: Pedidos por estado.\n");
+  printf("[5]: Monto promedio de pedidos pendientes.\n");
+  printf("[6]: Pedidos con prioridad alta que esten 'En camino'.\n");
+  printf("[7]: Cliente con mayor cantidad de pedidos.\n");
+  printf("[8]: Tiempo promedio estimado de pedidos no entregados.\n");
+  printf("[9]: Volver.\n");
+}
+
+void crearMenuMuestra(tNodo** cabecera) {
+  int opcion;
+  int salir = false;
+
+  do {
+    mostrarOpcionesMenuMuestra();
+    printf("Seleccione una opcion: ");
+    scanf("%d", &opcion);
+    printf("\n\n");
+
+    switch (opcion) {
+    case 1:
+      mostrarLista(cabecera);
+      break;
+    case 2:
+      buscarPorCliente(cabecera);
+      break;
+    // case 3:
+    //   insertarEnPos(cabecera);
+    //   break;
+    // case 4:
+    //   insertarAlFinal(cabecera);
+    //   break;
+    case 9:
+      salir = true;
+      break;
+    default:
+      printf("Opcion invalida.\n");
+    }
+  } while (!salir);
+}
+
+// Menu
 void mostrarOpciones() {
   printf("\n\n========================| Menu |========================\n");
-  printf(
-      "[a]: Crear nuevo pedido (calcular automáticamente costo envío, tiempo y "
-      "prioridad).\n");
-  printf("[b]: Cambiar estado de un pedido (buscar por número de pedido).\n");
+  printf("[a]: Crear nuevo pedido (calcular automaticamente costo envio, tiempo y prioridad).\n");
+  printf("[b]: Cambiar estado de un pedido (buscar por numero de pedido).\n");
   printf("[c]: Eliminar pedidos entregados.\n");
-  printf("[d]: Buscar pedidos por cliente.\n");
-  printf(
-      "[e]: Mostrar todos los pedidos según la prioridad que se desee "
-      "consultar.\n");
-  printf(
-      "[f]: Mostrar el total de pedidos según el estado que se desee "
-      "consultar.\n");
-  printf("[g]: Calcular y mostrar el monto promedio de pedidos pendientes.\n");
-  printf("[h]: Listado de pedidos con prioridad alta que estén 'En camino'.\n");
-  printf("[i]: Cliente con mayor cantidad de pedidos.\n");
-  printf("[j]: Tiempo promedio estimado de pedidos no entregados.\n");
-  printf(
-      "[k]: Aplicar descuento del 10%% a pedidos de un cliente específico.\n");
-  printf(
-      "[k]: Marcar como 'Entregado' todos los pedidos 'En camino' de más de 60 "
-      "minutos.\n");
+  printf("[d]: Muestra y busqueda.\n");
+  printf("[k]: Aplicar descuento del 10%% a pedidos de un cliente especifico.\n");
+  printf("[l]: Marcar como 'Entregado' todos los pedidos 'En camino' de mas de 60 minutos.\n");
   printf("[x]: Salir.\n");
 }
 
@@ -209,15 +341,18 @@ void crearMenu(tNodo** cabecera) {
     printf("\n\n");
 
     switch (opcion) {
-      case 'a':
-        push(cabecera);
-        break;
-      case 'x':
-        salir = true;
-        break;
+    case 'a':
+      push(cabecera);
+      break;
+    case 'd':
+      crearMenuMuestra(cabecera);
+      break;
+    case 'x':
+      salir = true;
+      break;
 
-      default:
-        printf("Opcion invalida.\n");
+    default:
+      printf("Opcion invalida.\n");
     }
 
   } while (!salir);
