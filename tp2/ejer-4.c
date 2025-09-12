@@ -81,6 +81,7 @@ void mostrarOpcionesPrioridad();
 void buscarPorPrioridad(tNodo**);
 void buscarPorEstado(tNodo**);
 void promedioDePedidosPendientes(tNodo**);
+void mostrarPedidosAltaEnCamino(tNodo**);
 
 // Menú
 void mostrarOpcionesMenuMuestra();
@@ -396,10 +397,92 @@ void promedioDePedidosPendientes(tNodo** cabecera) {
     aux = aux->siguiente;
   }
   float result = ((float)contPendientes / contTotal) * 100;
-  printf("Porcentaje de pedidos pendientes: %%.2f", result);
+  printf("Porcentaje de pedidos pendientes: %%%.2f", result);
 }
 
- 
+void mostrarPedidosAltaEnCamino(tNodo** cabecera) {
+  tNodo* aux = *cabecera;
+  int pos = 0;
+  while (aux) {
+    if ((strcmp(aux->datos.prioridad, "Alta") == 0) &&
+        (strcmp(aux->datos.estadoPedido, "En camino")) == 0) {
+      mostrarDatos(aux->datos);
+      printf("\nPosicion: %d\n\n", pos);
+    }
+    aux = aux->siguiente;
+    pos++;
+  }
+}
+
+void calcularClienteConMasPedidos(tNodo** cabecera) {
+  tNodo* aux = *cabecera;
+  tNodo* aux2 = *cabecera;
+
+  typedef struct {
+    tString cliente;
+    int cantPedidos;
+    int pos;
+  } tClienteMaxPedidos;
+
+  typedef struct nodoCliente {
+    tClienteMaxPedidos datos;
+    struct nodoCLiente* siguiente;
+  } tNodoCliente;
+
+  tNodoCliente* cabeceraAux = NULL;
+
+  while (aux) {
+    tString nomCliente;
+    strcpy(nomCliente, aux->datos.nombreCliente);
+    int cantPedidosCliente = 0;
+    int pos = 0;
+    while (aux2) {
+      if (strcmp(nomCliente, aux2->datos.nombreCliente) == 0) {
+        cantPedidosCliente++;
+      }
+      aux2 = aux2->siguiente;
+    }
+
+    tNodoCliente* nodo;
+
+    nodo = (tNodoCliente*)malloc(sizeof(tNodoCliente));
+
+    if (nodo == NULL) {
+      printf("Error al asignar memoria");
+    }
+
+    strcpy(nodo->datos.cliente, nomCliente);
+    nodo->datos.cantPedidos = cantPedidosCliente;
+    nodo->datos.pos = pos;
+    if (!cabeceraAux) {
+      nodo->siguiente = NULL;
+    } else {
+      nodo->siguiente = cabeceraAux;
+    }
+
+    aux = aux->siguiente;
+    pos++;
+  }
+
+  tClienteMaxPedidos resultMaxCLienteMaxPedidos;
+  tNodoCliente* aux3 = cabeceraAux;
+  strcpy(resultMaxCLienteMaxPedidos.cliente, aux3->datos.cliente);
+  resultMaxCLienteMaxPedidos.cantPedidos = aux3->datos.cantPedidos;
+  resultMaxCLienteMaxPedidos.pos = aux3->datos.pos;
+
+  while (aux3) {
+    if (aux3->datos.cantPedidos > resultMaxCLienteMaxPedidos.cantPedidos) {
+      strcpy(resultMaxCLienteMaxPedidos.cliente, aux3->datos.cliente);
+      resultMaxCLienteMaxPedidos.cantPedidos = aux3->datos.cantPedidos;
+      resultMaxCLienteMaxPedidos.pos = aux3->datos.pos;
+    }
+    aux3 = aux3->siguiente;
+  }
+
+  printf("El cliente con mas pedidos es: %s, teniendo %d pedidos.",
+         resultMaxCLienteMaxPedidos.cliente,
+         resultMaxCLienteMaxPedidos.cantPedidos);
+}
 
 void mostrarOpcionesMenuMuestra() {
   printf(
@@ -442,12 +525,10 @@ void crearMenuMuestra(tNodo** cabecera) {
       case 5:
         promedioDePedidosPendientes(cabecera);
         break;
-      // case 3:
-      //   insertarEnPos(cabecera);
-      //   break;
-      // case 4:
-      //   insertarAlFinal(cabecera);
-      //   break;
+      case 6:
+        mostrarPedidosAltaEnCamino(cabecera);
+        break;
+
       case 9:
         salir = true;
         break;
@@ -465,7 +546,7 @@ void mostrarOpciones() {
       "prioridad).\n");
   printf("[b]: Cambiar estado de un pedido (buscar por numero de pedido).\n");
   printf("[c]: Eliminar pedidos entregados.\n");
-  printf("[d]: Muestra y busqueda.\n"); // Submenú
+  printf("[d]: Muestra y busqueda.\n");  // Submenú
   printf(
       "[k]: Aplicar descuento del 10%% a pedidos de un cliente especifico.\n");
   printf(
