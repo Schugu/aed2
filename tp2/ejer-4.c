@@ -80,6 +80,7 @@ void buscarPorCliente(tNodo**);
 void mostrarOpcionesPrioridad();
 void buscarPorPrioridad(tNodo**);
 void buscarPorEstado(tNodo**);
+void promedioDePedidosPendientes(tNodo**);
 
 // Menú
 void mostrarOpcionesMenuMuestra();
@@ -309,10 +310,10 @@ void buscarPorCliente(tNodo** cabecera) {
   tNodo* aux = *cabecera;
   int pos = 0;
   while (aux) {
-    tString auxTitulo;
-    strcpy(auxTitulo, aux->datos.nombreCliente);
-    convertirMinuscula(auxTitulo);
-    if (strcmp(auxTitulo, busqueda) == 0) {
+    tString auxCliente;
+    strcpy(auxCliente, aux->datos.nombreCliente);
+    convertirMinuscula(auxCliente);
+    if (strcmp(auxCliente, busqueda) == 0) {
       mostrarDatos(aux->datos);
       printf("\nPosicion: %d", pos);
       return;
@@ -383,6 +384,23 @@ void buscarPorEstado(tNodo** cabecera) {
   }
 }
 
+void promedioDePedidosPendientes(tNodo** cabecera) {
+  tNodo* aux = *cabecera;
+  int contTotal = 0;
+  int contPendientes = 0;
+  while (aux) {
+    if (strcmp(aux->datos.estadoPedido, "Pendiente") == 0) {
+      contPendientes++;
+    }
+    contTotal++;
+    aux = aux->siguiente;
+  }
+  float result = ((float)contPendientes / contTotal) * 100;
+  printf("Porcentaje de pedidos pendientes: %%.2f", result);
+}
+
+ 
+
 void mostrarOpcionesMenuMuestra() {
   printf(
       "\n\n========================| Muestra y busqueda "
@@ -401,11 +419,11 @@ void mostrarOpcionesMenuMuestra() {
 void crearMenuMuestra(tNodo** cabecera) {
   int opcion;
   int salir = false;
-
   do {
     mostrarOpcionesMenuMuestra();
     printf("Seleccione una opcion: ");
     scanf("%d", &opcion);
+
     printf("\n\n");
 
     switch (opcion) {
@@ -420,6 +438,9 @@ void crearMenuMuestra(tNodo** cabecera) {
         break;
       case 4:
         buscarPorEstado(cabecera);
+        break;
+      case 5:
+        promedioDePedidosPendientes(cabecera);
         break;
       // case 3:
       //   insertarEnPos(cabecera);
@@ -444,7 +465,7 @@ void mostrarOpciones() {
       "prioridad).\n");
   printf("[b]: Cambiar estado de un pedido (buscar por numero de pedido).\n");
   printf("[c]: Eliminar pedidos entregados.\n");
-  printf("[d]: Muestra y busqueda.\n");
+  printf("[d]: Muestra y busqueda.\n"); // Submenú
   printf(
       "[k]: Aplicar descuento del 10%% a pedidos de un cliente especifico.\n");
   printf(
