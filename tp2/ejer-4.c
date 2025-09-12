@@ -80,8 +80,9 @@ void buscarPorCliente(tNodo**);
 void mostrarOpcionesPrioridad();
 void buscarPorPrioridad(tNodo**);
 void buscarPorEstado(tNodo**);
-void promedioDePedidosPendientes(tNodo**);
+void montoPromedioPedidosPendientes(tNodo**);
 void mostrarPedidosAltaEnCamino(tNodo**);
+void calcularClienteConMasPedidos(tNodo**);
 
 // Menú
 void mostrarOpcionesMenuMuestra();
@@ -116,25 +117,25 @@ void elegirEstadoPedido(tString estado) {
     scanf("%d", &opcion);
     printf("\n");
     switch (opcion) {
-      case 1:
-        strcpy(estado, arrayEstadoPedido[0]);
-        valido = true;
-        break;
-      case 2:
-        strcpy(estado, arrayEstadoPedido[1]);
-        valido = true;
-        break;
-      case 3:
-        strcpy(estado, arrayEstadoPedido[2]);
-        valido = true;
-        break;
-      case 4:
-        strcpy(estado, arrayEstadoPedido[3]);
-        valido = true;
-        break;
-      default:
-        printf("Opcion invalida, por favor ingresela de nuevo.\n");
-        break;
+    case 1:
+      strcpy(estado, arrayEstadoPedido[0]);
+      valido = true;
+      break;
+    case 2:
+      strcpy(estado, arrayEstadoPedido[1]);
+      valido = true;
+      break;
+    case 3:
+      strcpy(estado, arrayEstadoPedido[2]);
+      valido = true;
+      break;
+    case 4:
+      strcpy(estado, arrayEstadoPedido[3]);
+      valido = true;
+      break;
+    default:
+      printf("Opcion invalida, por favor ingresela de nuevo.\n");
+      break;
     }
   } while (!valido);
 }
@@ -255,6 +256,17 @@ void seed(tNodo** cabecera) {
   pedido.tiempoEstimado = 30;
   strcpy(pedido.prioridad, "Normal");
   insertarNodo(cabecera, pedido);
+
+  pedido.numero = 5;
+  strcpy(pedido.nombreCliente, "Jorge");
+  strcpy(pedido.direccion, "Calle 4");
+  strcpy(pedido.telefono, "123456789");
+  pedido.montoTotal = 60000;
+  strcpy(pedido.estadoPedido, "Pendiente");
+  pedido.costoEnvio = 0;
+  pedido.tiempoEstimado = 200;
+  strcpy(pedido.prioridad, "Alta");
+  insertarNodo(cabecera, pedido);
 }
 
 // Punto d)
@@ -343,16 +355,16 @@ void buscarPorPrioridad(tNodo** cabecera) {
     printf("\n\n");
 
     switch (opcion) {
-      case 1:
-        strcpy(prioridad, "Alta");
-        salir = true;
-        break;
-      case 2:
-        strcpy(prioridad, "Normal");
-        salir = true;
-        break;
-      default:
-        printf("Opcion invalida");
+    case 1:
+      strcpy(prioridad, "Alta");
+      salir = true;
+      break;
+    case 2:
+      strcpy(prioridad, "Normal");
+      salir = true;
+      break;
+    default:
+      printf("Opcion invalida");
     }
 
   } while (!salir);
@@ -385,19 +397,19 @@ void buscarPorEstado(tNodo** cabecera) {
   }
 }
 
-void promedioDePedidosPendientes(tNodo** cabecera) {
+void montoPromedioPedidosPendientes(tNodo** cabecera) {
   tNodo* aux = *cabecera;
-  int contTotal = 0;
-  int contPendientes = 0;
+  int cantidadTotalPendientes = 0;
+  float montoTotalPendientes = 0;
   while (aux) {
     if (strcmp(aux->datos.estadoPedido, "Pendiente") == 0) {
-      contPendientes++;
+      cantidadTotalPendientes++;
+      montoTotalPendientes += aux->datos.montoTotal;
     }
-    contTotal++;
     aux = aux->siguiente;
   }
-  float result = ((float)contPendientes / contTotal) * 100;
-  printf("Porcentaje de pedidos pendientes: %%%.2f", result);
+  float promedio = (montoTotalPendientes / cantidadTotalPendientes);
+  printf("Promedio de monto total de pedidos pendientes: $%.2f\n", promedio);
 }
 
 void mostrarPedidosAltaEnCamino(tNodo** cabecera) {
@@ -415,73 +427,37 @@ void mostrarPedidosAltaEnCamino(tNodo** cabecera) {
 }
 
 void calcularClienteConMasPedidos(tNodo** cabecera) {
-  tNodo* aux = *cabecera;
-  tNodo* aux2 = *cabecera;
-
   typedef struct {
     tString cliente;
     int cantPedidos;
-    int pos;
   } tClienteMaxPedidos;
 
-  typedef struct nodoCliente {
-    tClienteMaxPedidos datos;
-    struct nodoCLiente* siguiente;
-  } tNodoCliente;
-
-  tNodoCliente* cabeceraAux = NULL;
+  tNodo* aux = *cabecera;
+  tClienteMaxPedidos resultMaxCliente;
+  resultMaxCliente.cantPedidos = -1;
 
   while (aux) {
-    tString nomCliente;
-    strcpy(nomCliente, aux->datos.nombreCliente);
     int cantPedidosCliente = 0;
-    int pos = 0;
+    tNodo* aux2 = *cabecera;
+
     while (aux2) {
-      if (strcmp(nomCliente, aux2->datos.nombreCliente) == 0) {
+      if (strcmp(aux->datos.nombreCliente, aux2->datos.nombreCliente) == 0) {
         cantPedidosCliente++;
       }
       aux2 = aux2->siguiente;
     }
 
-    tNodoCliente* nodo;
-
-    nodo = (tNodoCliente*)malloc(sizeof(tNodoCliente));
-
-    if (nodo == NULL) {
-      printf("Error al asignar memoria");
-    }
-
-    strcpy(nodo->datos.cliente, nomCliente);
-    nodo->datos.cantPedidos = cantPedidosCliente;
-    nodo->datos.pos = pos;
-    if (!cabeceraAux) {
-      nodo->siguiente = NULL;
-    } else {
-      nodo->siguiente = cabeceraAux;
+    if (cantPedidosCliente > resultMaxCliente.cantPedidos) {
+      strcpy(resultMaxCliente.cliente, aux->datos.nombreCliente);
+      resultMaxCliente.cantPedidos = cantPedidosCliente;
     }
 
     aux = aux->siguiente;
-    pos++;
   }
 
-  tClienteMaxPedidos resultMaxCLienteMaxPedidos;
-  tNodoCliente* aux3 = cabeceraAux;
-  strcpy(resultMaxCLienteMaxPedidos.cliente, aux3->datos.cliente);
-  resultMaxCLienteMaxPedidos.cantPedidos = aux3->datos.cantPedidos;
-  resultMaxCLienteMaxPedidos.pos = aux3->datos.pos;
-
-  while (aux3) {
-    if (aux3->datos.cantPedidos > resultMaxCLienteMaxPedidos.cantPedidos) {
-      strcpy(resultMaxCLienteMaxPedidos.cliente, aux3->datos.cliente);
-      resultMaxCLienteMaxPedidos.cantPedidos = aux3->datos.cantPedidos;
-      resultMaxCLienteMaxPedidos.pos = aux3->datos.pos;
-    }
-    aux3 = aux3->siguiente;
-  }
-
-  printf("El cliente con mas pedidos es: %s, teniendo %d pedidos.",
-         resultMaxCLienteMaxPedidos.cliente,
-         resultMaxCLienteMaxPedidos.cantPedidos);
+  printf("El cliente con mas pedidos es: %s, teniendo %d pedidos.\n",
+         resultMaxCliente.cliente,
+         resultMaxCliente.cantPedidos);
 }
 
 void mostrarOpcionesMenuMuestra() {
@@ -510,30 +486,32 @@ void crearMenuMuestra(tNodo** cabecera) {
     printf("\n\n");
 
     switch (opcion) {
-      case 1:
-        mostrarLista(cabecera);
-        break;
-      case 2:
-        buscarPorCliente(cabecera);
-        break;
-      case 3:
-        buscarPorPrioridad(cabecera);
-        break;
-      case 4:
-        buscarPorEstado(cabecera);
-        break;
-      case 5:
-        promedioDePedidosPendientes(cabecera);
-        break;
-      case 6:
-        mostrarPedidosAltaEnCamino(cabecera);
-        break;
-
-      case 9:
-        salir = true;
-        break;
-      default:
-        printf("Opcion invalida.\n");
+    case 1:
+      mostrarLista(cabecera);
+      break;
+    case 2:
+      buscarPorCliente(cabecera);
+      break;
+    case 3:
+      buscarPorPrioridad(cabecera);
+      break;
+    case 4:
+      buscarPorEstado(cabecera);
+      break;
+    case 5:
+      montoPromedioPedidosPendientes(cabecera);
+      break;
+    case 6:
+      mostrarPedidosAltaEnCamino(cabecera);
+      break;
+    case 7:
+      calcularClienteConMasPedidos(cabecera);
+      break;
+    case 9:
+      salir = true;
+      break;
+    default:
+      printf("Opcion invalida.\n");
     }
   } while (!salir);
 }
@@ -546,7 +524,7 @@ void mostrarOpciones() {
       "prioridad).\n");
   printf("[b]: Cambiar estado de un pedido (buscar por numero de pedido).\n");
   printf("[c]: Eliminar pedidos entregados.\n");
-  printf("[d]: Muestra y busqueda.\n");  // Submenú
+  printf("[d]: Muestra y busqueda.\n"); // Submenú
   printf(
       "[k]: Aplicar descuento del 10%% a pedidos de un cliente especifico.\n");
   printf(
@@ -568,18 +546,18 @@ void crearMenu(tNodo** cabecera) {
     printf("\n\n");
 
     switch (opcion) {
-      case 'a':
-        push(cabecera);
-        break;
-      case 'd':
-        crearMenuMuestra(cabecera);
-        break;
-      case 'x':
-        salir = true;
-        break;
+    case 'a':
+      push(cabecera);
+      break;
+    case 'd':
+      crearMenuMuestra(cabecera);
+      break;
+    case 'x':
+      salir = true;
+      break;
 
-      default:
-        printf("Opcion invalida.\n");
+    default:
+      printf("Opcion invalida.\n");
     }
 
   } while (!salir);
