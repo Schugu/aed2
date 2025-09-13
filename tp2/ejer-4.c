@@ -70,6 +70,9 @@ tDatosPedido ingresarDatos();
 void push(tNodo**);
 void seed(tNodo**);
 
+// Punto b)
+void cambiarEstaodDePedido(tNodo**);
+
 // Punto d)
 bool estaLaListaVacia(tNodo**);
 void mostrarDatos(tDatosPedido);
@@ -480,6 +483,36 @@ void tiempoPromedioDePedidosNoEntregados(tNodo** cabecera) {
   printf("Promedio de tiempo estimado para pedidos no entregados: %.2f minutos", promedio);
 }
 
+// Punto b)
+void cambiarEstaodDePedido(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se puede cambiar de estado, la lista está vacía.\n");
+    return;
+  }
+
+  int busqueda;
+  printf("Ingrese el numero de pedido: ");
+  scanf("%d", &busqueda);
+
+  if (busqueda < 0) {
+    printf("Numero de pedido invalido.");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  while (aux) {
+    if (aux->datos.numero == busqueda) {
+      elegirEstadoPedido(aux->datos.estadoPedido);
+      printf("Estado cambiado con exito!");
+      mostrarDatos(aux->datos);
+      return;
+    }
+    aux = aux->siguiente;
+  }
+  printf("No se encontraron resultaodos...");
+  return;
+}
+
 void mostrarOpcionesMenuMuestra() {
   printf("\n\n========================| Muestra y busqueda |========================\n");
   printf("[1]: Todos los pedidos.\n");
@@ -569,6 +602,9 @@ void crearMenu(tNodo** cabecera) {
     switch (opcion) {
     case 'a':
       push(cabecera);
+      break;
+    case 'b':
+      cambiarEstaodDePedido(cabecera);
       break;
     case 'd':
       crearMenuMuestra(cabecera);
