@@ -42,8 +42,7 @@
 // Tipos
 typedef char tString[MAXSTRING];
 
-tString arrayEstadoPedido[4] = {"Pendiente", "Preparando", "En camino",
-                                "Entregado"};
+tString arrayEstadoPedido[4] = {"Pendiente", "Preparando", "En camino", "Entregado"};
 
 // Tipos
 typedef struct {
@@ -83,6 +82,7 @@ void buscarPorEstado(tNodo**);
 void montoPromedioPedidosPendientes(tNodo**);
 void mostrarPedidosAltaEnCamino(tNodo**);
 void calcularClienteConMasPedidos(tNodo**);
+void tiempoPromedioDePedidosNoEntregados(tNodo**);
 
 // Menú
 void mostrarOpcionesMenuMuestra();
@@ -308,7 +308,6 @@ void convertirMinuscula(tString string) {
     string[i] = tolower(string[i]);
   }
 }
-
 void buscarPorCliente(tNodo** cabecera) {
   if (estaLaListaVacia(cabecera)) {
     printf("Error: no se puede buscar, la lista por que esta vacia.");
@@ -338,12 +337,12 @@ void buscarPorCliente(tNodo** cabecera) {
   return;
 }
 
+// Punto d.3)
 void mostrarOpcionesPrioridad() {
   printf("\n\n=====================| Prioridad |=====================\n");
   printf("[1]: Alta.\n");
   printf("[2]: Normal.\n");
 }
-
 void buscarPorPrioridad(tNodo** cabecera) {
   int opcion;
   bool salir = false;
@@ -381,6 +380,7 @@ void buscarPorPrioridad(tNodo** cabecera) {
   }
 }
 
+// Punto d.4)
 void buscarPorEstado(tNodo** cabecera) {
   tString estado;
   elegirEstadoPedido(estado);
@@ -397,6 +397,7 @@ void buscarPorEstado(tNodo** cabecera) {
   }
 }
 
+// Punto d.5)
 void montoPromedioPedidosPendientes(tNodo** cabecera) {
   tNodo* aux = *cabecera;
   int cantidadTotalPendientes = 0;
@@ -412,6 +413,7 @@ void montoPromedioPedidosPendientes(tNodo** cabecera) {
   printf("Promedio de monto total de pedidos pendientes: $%.2f\n", promedio);
 }
 
+// Punto d.6)
 void mostrarPedidosAltaEnCamino(tNodo** cabecera) {
   tNodo* aux = *cabecera;
   int pos = 0;
@@ -426,6 +428,7 @@ void mostrarPedidosAltaEnCamino(tNodo** cabecera) {
   }
 }
 
+// Punto d.7)
 void calcularClienteConMasPedidos(tNodo** cabecera) {
   typedef struct {
     tString cliente;
@@ -460,10 +463,25 @@ void calcularClienteConMasPedidos(tNodo** cabecera) {
          resultMaxCliente.cantPedidos);
 }
 
+// Punto d.8)
+void tiempoPromedioDePedidosNoEntregados(tNodo** cabecera) {
+  tNodo* aux = *cabecera;
+  int contTiempo = 0;
+  int totalPedidos = 0;
+  while (aux) {
+    if (!(strcmp(aux->datos.estadoPedido, "Entregado") == 0)) {
+      contTiempo += aux->datos.tiempoEstimado;
+      totalPedidos++;
+    }
+    aux = aux->siguiente;
+  }
+
+  float promedio = (float)contTiempo / totalPedidos;
+  printf("Promedio de tiempo estimado para pedidos no entregados: %.2f minutos", promedio);
+}
+
 void mostrarOpcionesMenuMuestra() {
-  printf(
-      "\n\n========================| Muestra y busqueda "
-      "|========================\n");
+  printf("\n\n========================| Muestra y busqueda |========================\n");
   printf("[1]: Todos los pedidos.\n");
   printf("[2]: Pedidos por cliente.\n");
   printf("[3]: Pedidos por prioridad.\n");
@@ -506,6 +524,9 @@ void crearMenuMuestra(tNodo** cabecera) {
       break;
     case 7:
       calcularClienteConMasPedidos(cabecera);
+      break;
+    case 8:
+      tiempoPromedioDePedidosNoEntregados(cabecera);
       break;
     case 9:
       salir = true;
