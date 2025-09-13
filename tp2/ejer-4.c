@@ -93,6 +93,9 @@ void tiempoPromedioDePedidosNoEntregados(tNodo**);
 // Punto k)
 void aplicarDescuentoPorCliente(tNodo**);
 
+// Punto l)
+void marcarEntregadoPedidos(tNodo**);
+
 // Menú
 void mostrarOpcionesMenuMuestra();
 void crearMenuMuestra(tNodo**);
@@ -263,7 +266,7 @@ void seed(tNodo** cabecera) {
   pedido.montoTotal = 100;
   strcpy(pedido.estadoPedido, "En camino");
   pedido.costoEnvio = 500;
-  pedido.tiempoEstimado = 30;
+  pedido.tiempoEstimado = 61;
   strcpy(pedido.prioridad, "Normal");
   insertarNodo(cabecera, pedido);
 
@@ -572,6 +575,24 @@ void aplicarDescuentoPorCliente(tNodo** cabecera) {
   }
 }
 
+// Punto l)
+void marcarEntregadoPedidos(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se puede aplicar el descuento, la lista por que esta vacia.");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  int pos = 0;
+  while (aux) {
+    if ((strcmp(aux->datos.estadoPedido, "En camino") == 0) && (aux->datos.tiempoEstimado > 60)) {
+      strcpy(aux->datos.estadoPedido, "Entregado");
+      printf("Pedido: %d marcado como entregado.\n", aux->datos.numero);
+    }
+    aux = aux->siguiente;
+  }
+}
+
 void mostrarOpcionesMenuMuestra() {
   printf("\n\n========================| Muestra y busqueda |========================\n");
   printf("[1]: Todos los pedidos.\n");
@@ -668,6 +689,9 @@ void crearMenu(tNodo** cabecera) {
       break;
     case 'k':
       aplicarDescuentoPorCliente(cabecera);
+      break;
+    case 'l':
+      marcarEntregadoPedidos(cabecera);
       break;
     case 'x':
       salir = true;
