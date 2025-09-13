@@ -90,6 +90,9 @@ void mostrarPedidosAltaEnCamino(tNodo**);
 void calcularClienteConMasPedidos(tNodo**);
 void tiempoPromedioDePedidosNoEntregados(tNodo**);
 
+// Punto k)
+void aplicarDescuentoPorCliente(tNodo**);
+
 // Menú
 void mostrarOpcionesMenuMuestra();
 void crearMenuMuestra(tNodo**);
@@ -211,6 +214,7 @@ void insertarNodo(tNodo** cabecera, tDatosPedido elemento) {
   *cabecera = nuevoNodo;
 }
 
+// Punto a)
 void push(tNodo** cabecera) {
   tDatosPedido elemento = ingresarDatos();
   insertarNodo(cabecera, elemento);
@@ -257,7 +261,7 @@ void seed(tNodo** cabecera) {
   strcpy(pedido.direccion, "Calle 4");
   strcpy(pedido.telefono, "123456789");
   pedido.montoTotal = 100;
-  strcpy(pedido.estadoPedido, "Entregado");
+  strcpy(pedido.estadoPedido, "En camino");
   pedido.costoEnvio = 500;
   pedido.tiempoEstimado = 30;
   strcpy(pedido.prioridad, "Normal");
@@ -273,6 +277,59 @@ void seed(tNodo** cabecera) {
   pedido.tiempoEstimado = 200;
   strcpy(pedido.prioridad, "Alta");
   insertarNodo(cabecera, pedido);
+}
+
+// Punto b)
+void cambiarEstaodDePedido(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se puede cambiar de estado, la lista está vacía.\n");
+    return;
+  }
+
+  int busqueda;
+  printf("Ingrese el numero de pedido: ");
+  scanf("%d", &busqueda);
+
+  if (busqueda < 0) {
+    printf("Numero de pedido invalido.");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  while (aux) {
+    if (aux->datos.numero == busqueda) {
+      elegirEstadoPedido(aux->datos.estadoPedido);
+      printf("Estado cambiado con exito!");
+      mostrarDatos(aux->datos);
+      return;
+    }
+    aux = aux->siguiente;
+  }
+  printf("No se encontraron resultaodos...");
+  return;
+}
+
+// Punto c)
+void eliminarPedidosEntregados(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se pueden eliminar los pedidos entregado ya que la lista esta vacia.");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  tNodo* anterior = NULL;
+  int pos = 0;
+
+  while (aux) {
+    if (strcmp(aux->datos.estadoPedido, "Entregado") == 0) {
+      anterior->siguiente = aux->siguiente;
+      free(aux);
+      printf("Pedido entregado en la posicion: %d eliminado exitosamente.", pos);
+    }
+    anterior = aux;
+    aux = aux->siguiente;
+    pos++;
+  }
 }
 
 // Punto d)
@@ -486,56 +543,32 @@ void tiempoPromedioDePedidosNoEntregados(tNodo** cabecera) {
   printf("Promedio de tiempo estimado para pedidos no entregados: %.2f minutos", promedio);
 }
 
-// Punto b)
-void cambiarEstaodDePedido(tNodo** cabecera) {
+// Punto k)
+void aplicarDescuentoPorCliente(tNodo** cabecera) {
   if (estaLaListaVacia(cabecera)) {
-    printf("Error: no se puede cambiar de estado, la lista está vacía.\n");
+    printf("Error: no se puede aplicar el descuento, la lista por que esta vacia.");
     return;
   }
 
-  int busqueda;
-  printf("Ingrese el numero de pedido: ");
-  scanf("%d", &busqueda);
-
-  if (busqueda < 0) {
-    printf("Numero de pedido invalido.");
-    return;
-  }
+  tString busqueda;
+  printf("Ingrese el nombre del cliente: ");
+  scanf(" %49[^\n]", busqueda);
+  convertirMinuscula(busqueda);
 
   tNodo* aux = *cabecera;
-  while (aux) {
-    if (aux->datos.numero == busqueda) {
-      elegirEstadoPedido(aux->datos.estadoPedido);
-      printf("Estado cambiado con exito!");
-      mostrarDatos(aux->datos);
-      return;
-    }
-    aux = aux->siguiente;
-  }
-  printf("No se encontraron resultaodos...");
-  return;
-}
-
-// Punto c)
-void eliminarPedidosEntregados(tNodo** cabecera) {
-  if (estaLaListaVacia(cabecera)) {
-    printf("Error: no se pueden eliminar los pedidos entregado ya que la lista esta vacia.");
-    return;
-  }
-
-  tNodo* aux = *cabecera;
-  tNodo* anterior = NULL;
   int pos = 0;
-
   while (aux) {
-    if (strcmp(aux->datos.estadoPedido, "Entregado") == 0) {
-      anterior->siguiente = aux->siguiente;
-      free(aux);
-      printf("Pedido entregado en la posicion: %d eliminado exitosamente.", pos);
+    tString auxCliente;
+    strcpy(auxCliente, aux->datos.nombreCliente);
+    convertirMinuscula(auxCliente);
+    if ((strcmp(auxCliente, busqueda) == 0) && !(strcmp(aux->datos.estadoPedido, "Entregado") == 0)) {
+      printf("Numero de pedido: %d\n", aux->datos.numero);
+      printf("Monto total sin descuento: $%.2f\n", aux->datos.montoTotal);
+      float descuento = aux->datos.montoTotal * 0.90; // 10% de descuento
+      aux->datos.montoTotal = descuento;
+      printf("Monto total con el 10%% apicado: $%.2f\n", aux->datos.montoTotal);
     }
-    anterior = aux;
     aux = aux->siguiente;
-    pos++;
   }
 }
 
@@ -599,17 +632,12 @@ void crearMenuMuestra(tNodo** cabecera) {
 // Menu
 void mostrarOpciones() {
   printf("\n\n========================| Menu |========================\n");
-  printf(
-      "[a]: Crear nuevo pedido (calcular automaticamente costo envio, tiempo y "
-      "prioridad).\n");
+  printf("[a]: Crear nuevo pedido (calcular automaticamente costo envio, tiempo y prioridad).\n");
   printf("[b]: Cambiar estado de un pedido (buscar por numero de pedido).\n");
   printf("[c]: Eliminar pedidos entregados.\n");
   printf("[d]: Muestra y busqueda.\n"); // Submenú
-  printf(
-      "[k]: Aplicar descuento del 10%% a pedidos de un cliente especifico.\n");
-  printf(
-      "[l]: Marcar como 'Entregado' todos los pedidos 'En camino' de mas de 60 "
-      "minutos.\n");
+  printf("[k]: Aplicar descuento del 10%% a pedidos de un cliente especifico.\n");
+  printf("[l]: Marcar como 'Entregado' todos los pedidos 'En camino' de mas de 60 minutos.\n");
   printf("[x]: Salir.\n");
 }
 
@@ -637,6 +665,9 @@ void crearMenu(tNodo** cabecera) {
       break;
     case 'd':
       crearMenuMuestra(cabecera);
+      break;
+    case 'k':
+      aplicarDescuentoPorCliente(cabecera);
       break;
     case 'x':
       salir = true;
