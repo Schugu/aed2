@@ -1,6 +1,7 @@
 # Prerequisites
 *.d
 /.vscode
+/pruebas
 
 # Object files
 *.o

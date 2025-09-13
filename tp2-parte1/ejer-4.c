@@ -66,6 +66,7 @@ typedef struct nodo {
 // Punto a)
 tNodo* crearNodo(tDatosPedido, tNodo*);
 void elegirEstadoPedido(tString);
+void insertarNodo(tNodo**, tDatosPedido);
 tDatosPedido ingresarDatos();
 void push(tNodo**);
 void seed(tNodo**);
