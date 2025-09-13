@@ -73,6 +73,9 @@ void seed(tNodo**);
 // Punto b)
 void cambiarEstaodDePedido(tNodo**);
 
+// Punto c)
+void eliminarPedidosEntregados(tNodo**);
+
 // Punto d)
 bool estaLaListaVacia(tNodo**);
 void mostrarDatos(tDatosPedido);
@@ -513,6 +516,29 @@ void cambiarEstaodDePedido(tNodo** cabecera) {
   return;
 }
 
+// Punto c)
+void eliminarPedidosEntregados(tNodo** cabecera) {
+  if (estaLaListaVacia(cabecera)) {
+    printf("Error: no se pueden eliminar los pedidos entregado ya que la lista esta vacia.");
+    return;
+  }
+
+  tNodo* aux = *cabecera;
+  tNodo* anterior = NULL;
+  int pos = 0;
+
+  while (aux) {
+    if (strcmp(aux->datos.estadoPedido, "Entregado") == 0) {
+      anterior->siguiente = aux->siguiente;
+      free(aux);
+      printf("Pedido entregado en la posicion: %d eliminado exitosamente.", pos);
+    }
+    anterior = aux;
+    aux = aux->siguiente;
+    pos++;
+  }
+}
+
 void mostrarOpcionesMenuMuestra() {
   printf("\n\n========================| Muestra y busqueda |========================\n");
   printf("[1]: Todos los pedidos.\n");
@@ -606,13 +632,15 @@ void crearMenu(tNodo** cabecera) {
     case 'b':
       cambiarEstaodDePedido(cabecera);
       break;
+    case 'c':
+      eliminarPedidosEntregados(cabecera);
+      break;
     case 'd':
       crearMenuMuestra(cabecera);
       break;
     case 'x':
       salir = true;
       break;
-
     default:
       printf("Opcion invalida.\n");
     }
