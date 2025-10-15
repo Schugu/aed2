@@ -50,9 +50,11 @@ void mostrarDatosPorAtencion(tCola* cola, int opcion) {
   tNodo* aux = cola->frente;
   int contador = 0;
   while (aux) {
-    printf("%d\t\t%s\t\t%s\t\t%d\n", aux->datos.dni, aux->datos.nombre, aux->datos.apellido, aux->datos.edad);
-    aux = aux->siguiente;
+    if(aux->datos.tipoAtencion == opcion){
+      printf("%d\t\t%s\t\t%s\t\t%d\n", aux->datos.dni, aux->datos.nombre, aux->datos.apellido, aux->datos.edad);
+    }
     contador++;
+    aux = aux->siguiente;
   }
   printf("Total de pacientes: %d", contador);
 }
