@@ -35,7 +35,8 @@ void mostrarLlamadasPorTipo(tNodo** cabecera, int codTipoLLamada) {
     totalLlamadas++;
   }
 
-  float porcentaje = (float)codTipoLLamada / totalLlamadas;
+  float porcentaje = ((float) codTipoLLamada / totalLlamadas) * 100; 
+  // Promedio la suma de los elementos / la cantidad de elementos
 
   printf("Porcentaje de llamadas '%s' respecto del de llamadas: %.2f", tipoLlamada[codTipoLLamada], porcentaje);
 }
