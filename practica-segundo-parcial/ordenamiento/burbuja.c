@@ -44,14 +44,16 @@ void mostrarDatos(tVectorInt pVector) {
     printf("\n");
 }
 
+/*
+    Ordenamiento por burbuja:
+    Este algoritmo funciona realizando varias pasadas0 por el vector.
+    En cada pasada, se comparan elementos consecutivos (j y j+1).
+    Si están desordenados (el de la izquierda es mayor que el de la derecha),
+    se intercambian. Esto hace que los elementos más grandes vayan
+    desplazándose hacia la derecha del vector
+*/
 void ordenarBurbuja(tVectorInt pVector) {
     int aux; // Auxiliar para guardar valores
-
-    // Este algoritmo funciona realizando varias pasadas0 por el vector.
-    // En cada pasada, se comparan elementos consecutivos (j y j+1).
-    // Si están desordenados (el de la izquierda es mayor que el de la derecha),
-    // se intercambian. Esto hace que los elementos más grandes vayan
-    // desplazándose hacia la derecha del vector
 
     for (int i = 0; i < MAX - 1; i++) { // Pasadas principales (una por cada elemento)
         // En cada pasada completa, al menos un elemento grande termina en su
