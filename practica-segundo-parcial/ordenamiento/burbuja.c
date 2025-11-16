@@ -45,7 +45,7 @@ void mostrarDatos(tVectorInt pVector) {
 }
 
 /*
-    Ordenamiento por burbuja:
+    Ordenamiento por burbuja o intercambio directo:
     Este algoritmo funciona realizando varias pasadas0 por el vector.
     En cada pasada, se comparan elementos consecutivos (j y j+1).
     Si están desordenados (el de la izquierda es mayor que el de la derecha),
