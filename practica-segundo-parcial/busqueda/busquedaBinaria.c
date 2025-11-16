@@ -60,6 +60,8 @@ int busquedaBinaria(tVectorInt pVector, int pElem) {
         posMed = (extInf + extSup) / 2; // Buscar la posición del medio
 
         // Si el elemento del vector en la posición central es igual al elemento buscado, marcarlo como encontrado
+        // Punto importante: el algoritmo va achicando rangos hasta que la posición del medio coincide con el elemento buscado.
+        // Si no lo encuentra, ya no entraría en el while porque el rango de búsqueda dejaría de ser válido.
         if (pVector[posMed] == pElem) {
             encontrado = true;
         } else if (pElem > pVector[posMed]) {
