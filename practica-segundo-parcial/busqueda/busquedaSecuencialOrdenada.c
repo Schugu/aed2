@@ -8,7 +8,7 @@
 typedef int tVectorInt[MAX];
 
 // Prototipado
-void crearVectorRandom(tVectorInt);
+void crearVectorOrdenado(tVectorInt);
 void mostrarDatos(tVectorInt);
 int busquedaSecuencialOrdenada(tVectorInt, int);
 
@@ -16,7 +16,7 @@ int busquedaSecuencialOrdenada(tVectorInt, int);
 int main() {
     tVectorInt vector;
 
-    crearVectorRandom(vector);
+    crearVectorOrdenado(vector);
     mostrarDatos(vector);
 
     int buscar = 5;
@@ -30,7 +30,7 @@ int main() {
 }
 
 // Funciones
-void crearVectorRandom(tVectorInt pVector) {
+void crearVectorOrdenado(tVectorInt pVector) {
     tVectorInt v = {1, 2, 3, 4, 5};
 
     for (int i = 0; i < MAX; i++) {
